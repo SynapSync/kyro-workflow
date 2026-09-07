@@ -22,7 +22,9 @@ const TOKEN_BUDGET = {
   // the skill is invocable on its own and the orchestrator — which held the only copy — never
   // loads on that path. Buying it back by trimming the contract was the wrong trade; a scope
   // hand-authored without the handshake costs far more than the tokens it saves.
-  sprintForgeSkillWords: 1280,
+  // Forge now carries the completion-vs-retirement routing contract for standalone invocation.
+  // 1330 leaves 11 words above the measured 1319-word asset.
+  sprintForgeSkillWords: 1330,
   seedbedSkillWords: 700,
   seedbedModeWords: 900,
   seedbedHelperWords: 450,
@@ -37,10 +39,12 @@ const TOKEN_BUDGET = {
   // 4.47.0 raised this from 4180: Forge/orchestrator/SKILL now diagnose integrity *before*
   // scope resolution. That step is load-bearing for an empty activeScope; trimming it to
   // keep the old ceiling would leave recovery unreachable on the execute route.
-  runtimeForgeExecuteTokens: 4320,
-  runtimeForgeReviewTokens: 4570,
-  runtimeForgePlanTokens: 4940,
-  runtimeForgeCloseTokens: 5610,
+  // Completion intent routing is loaded with every Forge path. These ceilings retain only
+  // 11–16 tokens above their measured paths (plan=5049, execute=4517, review=4674, close=5703).
+  runtimeForgeExecuteTokens: 4530,
+  runtimeForgeReviewTokens: 4690,
+  runtimeForgePlanTokens: 5060,
+  runtimeForgeCloseTokens: 5720,
   runtimeForgeInitTokens: 5010,
   // Seedbed-backed INIT adds one lazy mapping helper to the normal INIT route. The ceiling keeps
   // roughly 10% headroom over the measured router + orchestrator + skill + mode + analysis + mapping path.

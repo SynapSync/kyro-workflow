@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [4.48.1] - 2026-09-07
+
+### Fixed
+
+- **Forge routes finished-scope closure to `scope complete`.** After adaptive lifecycle stopped
+  inferring completion from the last sprint, agents matched "close the scope" to `kyro-scope-retire`
+  because Forge ignored user intent and skill discovery advertised retirement as the only scope-level
+  terminal path. Forge now overlays complete/close/finish (including "cierre del scope") onto
+  `kyro scope complete` before `nextAction`, idle `plan_sprint` packs also offer that recipe, and
+  the retire router refuses completion language. No new slash command or skill.
+
 ## [4.48.0] - 2026-08-29
 
 ### Added

@@ -172,7 +172,8 @@ claude --plugin-dir /path/to/kyro-ai
 | Get a summary before switching contexts | `/kyro:task-context` (copy-paste into a fresh session) |
 | Audit code & architecture independently | `/kyro:qa` (runs outside the forge cycle) |
 | Mature a rough idea into a plan | `/kyro:idea design a rate-limiting strategy` |
-| Retire an inactive scope | `/kyro:scope-retire <scope>` (prepare, show plan, require fresh human approval) |
+| Complete a finished scope | `/kyro:forge` (runs `kyro scope complete`; not retirement) |
+| Retire an obsolete/superseded scope | `/kyro:scope-retire <scope>` (prepare, show plan, require fresh human approval) |
 | Record evidence on a task | `kyro record-evidence <task> --evidence "…"` |
 | Mark a task complete after review | `kyro review <task> --verdict pass` |
 | Track technical debt | `kyro debt add --title "refactor auth" --tag database` |
@@ -188,12 +189,12 @@ Thin routers over scope state — they load only what the current step needs.
 
 | Command / skill | Role |
 | --------------- | ---- |
-| `/kyro:forge` · `kyro-forge` | Full cycle: analyze → plan → execute → review → close (gates) |
+| `/kyro:forge` · `kyro-forge` | Full cycle: analyze → plan → execute → review → close a sprint or complete a finished scope |
 | `/kyro:status` · `kyro-status` | Progress, roadmap, debt (`brief` / `full` / `debt`) |
 | `/kyro:idea` · `kyro-idea` | Optional pre-scope: mature an idea into an execution-ready brief |
 | `/kyro:qa` · `kyro-qa` | Independent certification audit (not the forge review gate) |
 | `/kyro:task-context` · `kyro-task-context` | Copy-paste prompt to continue in a fresh context |
-| `/kyro:scope-retire` · `kyro-scope-retire` | Two-phase retirement with a state-bound human approval gate |
+| `/kyro:scope-retire` · `kyro-scope-retire` | Two-phase retirement of an obsolete/superseded/discarded scope |
 
 ### Tool-owned CLI (required for state changes)
 
@@ -208,7 +209,8 @@ Thin routers over scope state — they load only what the current step needs.
 | `… debt add\|start\|resolve\|…` | Formal debt lifecycle |
 | `… rule add --rule "…" --tag process [--global]` | Register a scope rule; optionally promote it to every scope |
 | `… close-sprint --outcome …` | Lossless close + checkpoint (never null `activeSprint` by hand) |
-| `… scope retire --kyro-scope <scope> --reason "…"` | Read-only retirement plan; apply only with its digest and explicit human `--yes` |
+| `… scope complete --kyro-scope <scope> [--summary "…"] --yes` | Explicit finished-scope completion (Forge-owned; not retirement) |
+| `… scope retire --kyro-scope <scope> --reason "…"` | Read-only retirement plan for an obsolete scope; apply only with its digest and explicit human `--yes` |
 | `… context-pack --json` | Lean read for routing (prefer over opening full `sprint.json`) |
 | `… doctor` / `… doctor --artifacts` | Health and artifact shape |
 | `… analyze` | Semantic gates before close |
@@ -226,7 +228,7 @@ nothing else, so it cannot repair a record-level legacy shape: a debt that carri
 *and* legacy-only keys like `detail`/`resolution`/`addedSprint` *and* missing canonical fields.
 **4.44.0 and later** adds `debt.canonicalize` (remediation protocol v3), which repairs the whole
 record at once, emits exactly the seven canonical keys `id, title, origin, priority, status,
-targetSprint, note`, and names the legacy keys it retires. The current release, **4.48.0**, carries
+targetSprint, note`, and names the legacy keys it retires. The current release, **4.48.1**, carries
 that operation unchanged.
 
 Nothing is migrated for you. Installing a newer Kyro never rewrites an existing scope, and Doctor

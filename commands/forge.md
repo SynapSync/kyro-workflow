@@ -1,5 +1,5 @@
 ---
-description: Route the Kyro forge workflow with progressive disclosure
+description: "Route Kyro sprint work: plan, execute, review, close a sprint, or complete a finished scope. Not for obsolete or superseded scopes."
 argument-hint: <scope or request>
 ---
 
@@ -14,6 +14,18 @@ Continue Kyro work without loading the whole workflow upfront.
 3. Silently run `{{KYRO_CLI}} repair integrity prepare --kyro-scope <scope> --json` *before* `context-pack`, using the scope resolved above. Never omit `--kyro-scope` — it isolates this scope from unrelated drift. Findings/blockers → load `skills/sprint-forge/assets/modes/recover.md` and stop. None → discard and continue; do not ask.
 4. Resolve routing with `kyro context-pack --kyro-scope <scope> --json` (lean pack). Do not open the full `sprint.json`, archive Markdown, findings, templates, or helpers to route. Open the full `sprint.json` only to write, or in `plan_sprint`/`close_sprint` (see the Read Path Contract in `skills/sprint-forge/SKILL.md`).
 
+## User intent (before `nextAction`)
+
+`$ARGUMENTS` is intent, not only a scope id. Apply this overlay first.
+
+- **Complete / close / finish the scope**, objective met, no more sprints, "cierre del scope": this is **completion**, not retirement.
+  1. Preview `{{KYRO_CLI}} scope complete --kyro-scope <scope>` (no `--yes`).
+  2. Show the plan. Confirm they want completion (reopenable) — not another sprint, and not marking the scope obsolete.
+  3. After yes, run the same command with `--yes`. Stop.
+  4. Do not load plan-sprint. Forge never retires.
+- **Obsolete / superseded / discarded** (irreversible): STOP. That is the operator-only `kyro-scope-retire` router.
+- Otherwise route on `nextAction` below.
+
 ## Route (on the pack's `nextAction`)
 
 | Condition | Load next |
@@ -25,7 +37,7 @@ Continue Kyro work without loading the whole workflow upfront.
 | `nextAction: "execute_task"` | `skills/sprint-forge/assets/modes/execute-task.md` |
 | `nextAction: "review_task"` | `skills/sprint-forge/assets/modes/review-task.md` |
 | `nextAction: "close_sprint"` | `skills/sprint-forge/assets/modes/close-sprint.md` |
-| `nextAction: "done"` | Stop — scope complete. No mode. |
+| `nextAction: "done"` | Stop — already complete or retired. No mode. |
 | `sprint.json` missing/unparseable or inconsistent | `skills/sprint-forge/assets/modes/recover.md` |
 
 ## Rules

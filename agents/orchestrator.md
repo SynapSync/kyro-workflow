@@ -37,7 +37,7 @@ Open the full `sprint.json` only when `plan_sprint`/`close_sprint`/status-full n
 | `execute_task` | `assets/modes/SPRINT.md` + `assets/modes/execute-task.md` |
 | `review_task` | `assets/modes/SPRINT.md` + `assets/modes/review-task.md` |
 | `close_sprint` | `assets/modes/SPRINT.md` + `assets/modes/close-sprint.md` |
-| `done` | Stop — scope is complete. No work mode. |
+| `done` | Stop — already complete or retired. No work mode. |
 | inconsistent state | `assets/modes/SPRINT.md` + `assets/modes/recover.md` |
 | status report | `assets/modes/STATUS.md` |
 
@@ -53,13 +53,14 @@ Every Kyro state mutation is performed by the corresponding CLI verb. Per action
 | Task done | Run `{{KYRO_CLI}} record-evidence ...`. |
 | Task reviewed | Run `{{KYRO_CLI}} review ...`. |
 | Rule learned | Ask global; use `{{KYRO_CLI}} rule add`; no rule Markdown. |
-| Sprint close | Register rules, then run `{{KYRO_CLI}} close-sprint`. It checkpoints, appends `ledger[]`, clears `activeSprint`, and routes finished scopes to `done`; never clear state by hand. |
+| Sprint close | Register rules, then run `{{KYRO_CLI}} close-sprint`. It checkpoints, appends `ledger[]`, clears `activeSprint`, and returns to `plan_sprint`. Closing a sprint never completes the scope. |
+| Scope complete | When the user asks to complete/close a finished scope, preview `{{KYRO_CLI}} scope complete`, confirm, then `--yes`. Forge never retires. |
 
 Never edit `sprint.json`, `project.json`, `local.json`, checkpoints, or `archive/` with an editor, patch, or ad-hoc script. Kyro-managed state and history go through the CLI; INIT findings remain write-only analysis evidence.
 
 ## Gates and Quality
 
-- Ask for approval only at lifecycle gates (sprint close, scope close), not after every internal checkpoint.
+- Ask for approval only at lifecycle gates (sprint close, scope completion), not after every internal checkpoint.
 - Run validation appropriate to touched files before task completion.
 - Block completion on failing tests/typecheck, debug artifacts, secrets, syntax errors, or broken imports.
 - On failure, reproduce, identify root cause, fix once, revalidate; after three failed correction rounds, mark the task blocked with evidence.

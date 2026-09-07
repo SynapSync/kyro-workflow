@@ -1,6 +1,6 @@
 # Commands Reference
 
-Kyro provides 6 slash commands, most of them thin routers over the single source of truth: each reads structured state first, then loads only the mode/helper/template required for the current action. `/kyro:idea` is an optional **pre-scope** step that runs before any scope or `sprint.json` exists — it never reads or creates project state, and going straight to `/kyro:forge` without it is equally valid. `/kyro:qa` is an independent **certification audit** that can be run anytime to validate a scope against its specification, standing outside the forge gate lifecycle. `/kyro:scope-retire` is an operator-only terminal lifecycle flow and is never selected by Forge or a handoff.
+Kyro provides 6 slash commands, most of them thin routers over the single source of truth: each reads structured state first, then loads only the mode/helper/template required for the current action. `/kyro:idea` is an optional **pre-scope** step that runs before any scope or `sprint.json` exists — it never reads or creates project state, and going straight to `/kyro:forge` without it is equally valid. `/kyro:qa` is an independent **certification audit** that can be run anytime to validate a scope against its specification, standing outside the forge gate lifecycle. `/kyro:scope-retire` is an operator-only flow for obsolete, superseded, or discarded scopes and is never selected by Forge or a handoff. Completing finished work is Forge (`kyro scope complete`).
 
 ## Cost-Aware Routing
 
@@ -70,7 +70,7 @@ The argument describes what to analyze or work on. It can be a path, a module na
 
 ### Routing
 
-`/kyro:forge` starts with layered project state (`.agents/kyro/project.json` + `local.json`), then the scope's `sprint.json` when a scope exists. It routes on `sprint.json.handoff.nextAction` to exactly one mode:
+`/kyro:forge` starts with layered project state (`.agents/kyro/project.json` + `local.json`), then the scope's `sprint.json` when a scope exists. User intent to complete/close a finished scope is applied **before** `nextAction`: Forge previews `kyro scope complete`, confirms, then applies — it never retires. Otherwise it routes on `sprint.json.handoff.nextAction` to exactly one mode:
 
 ```text
 no roadmap       -> INIT.md
@@ -78,6 +78,7 @@ no active sprint -> plan-sprint.md
 pending tasks    -> execute-task.md
 validation       -> review-task.md
 closeout         -> close-sprint.md
+already terminal -> stop (done)
 inconsistent     -> recover.md
 ```
 
@@ -204,7 +205,7 @@ Reads the active scope, `kyro context-pack`, the current git status, and referen
 
 ## /kyro:scope-retire
 
-**Prepare and explicitly authorize an auditable terminal scope retirement.**
+**Permanently retire an obsolete, superseded, or discarded scope. Irreversible. Not for finished work.**
 
 ### Syntax
 
@@ -213,15 +214,16 @@ Reads the active scope, `kyro context-pack`, the current git status, and referen
 ```
 
 The router first runs the read-only preparation form of `kyro scope retire`, presents the complete
-plan and its state-bound digest, asks exactly “¿Autorizas retirar el scope `<scope>` con este
-plan?”, and stops. It may run apply only after a fresh, unequivocal human approval. Apply requires
+plan and its state-bound digest, asks exactly “¿Autorizas retirar de forma irreversible el scope `<scope>` (obsoleto, reemplazado o
+descartado) con este plan?”, and stops. It may run apply only after a fresh, unequivocal human approval. Apply requires
 the same inputs, the reviewed `--digest`, and `--yes`; stale state returns `DIVERGED` without writes.
 
 Retirement requires a registered scope with no active sprint and intact close checkpoints. It
 preserves `archive/` byte-for-byte, records the reason, timestamp and optional successor, clears the
 active-scope pointer when necessary, and leaves the scope terminal at `handoff.nextAction: done`.
 The command does not claim to prove the approver's cryptographic identity and is never auto-invoked
-from Forge, routing, or handoffs.
+from Forge, routing, or handoffs. Language such as close/complete/finish/cierre is completion, not
+retirement — the router must refuse it and send the user to `/kyro:forge`.
 
 ---
 

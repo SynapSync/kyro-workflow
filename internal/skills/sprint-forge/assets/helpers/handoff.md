@@ -26,8 +26,8 @@ Captures the mental context a fresh session needs to resume — hypotheses, deci
 ## Update points
 
 - Each task transition: refresh `nextTaskId`, `nextAction`, and `note`.
-- Done (scope complete): leave `nextAction: "done"`; set `note` only if residual context helps a future reopen.
-- Sprint close: point `note` at the next sprint or scope completion.
+- Done (already complete or retired): leave `nextAction: "done"`; set `note` only if residual context helps a future reopen.
+- Sprint close: point `note` at the next sprint or an explicit scope completion (`scope complete`), never retirement.
 
 ## Generation
 

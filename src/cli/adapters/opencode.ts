@@ -1,6 +1,6 @@
 import { AGENT, ARTIFACT_ROOT, COMMAND_NAMES, KYRO_COMMANDS_ROOT, KYRO_ROOT } from '../constants';
 import type { AdapterDefinition } from './registry-types';
-import { addCommandSkillProjectionToRoot, buildCommandSkillManagedFilesForRoot } from './command-skills';
+import { addCommandSkillProjectionToRoot, buildCommandSkillManagedFilesForRoot, getCommandDescription } from './command-skills';
 import { managedPathExists } from '../fs';
 import { detectFromPaths } from './detection';
 import type { CheckResult, KyroCommandName, OperationPlan } from '../types';
@@ -91,14 +91,11 @@ function buildOpenCodeManagedFiles(): string[] {
 }
 
 function buildOpenCodeCommand(command: KyroCommandName): string {
-  const description = command === 'forge'
-    ? 'Run the Kyro forge workflow'
-    : command === 'status'
-      ? 'Show Kyro project status'
-      : command === 'idea'
-        ? 'Mature a rough or mature idea into an execution-ready plan before starting a scope'
-        : 'Generate a fresh-context prompt';
-  return `---\ndescription: ${description}\n---\n\nLoad \`${OPENCODE_SKILLS_ROOT}/kyro-${command}/SKILL.md\` and follow it. The skill must read \`${KYRO_COMMANDS_ROOT}/${command}.md\` first, then load only the routed Kyro mode/helper files.\n\nRuntime: \`${KYRO_ROOT}/\`\nArtifacts: \`${ARTIFACT_ROOT}/{scope}/\`\n\nDo not inline the full Kyro workflow or ask the user to restate it.\n`;
+  // check:seedbed treats this native command copy as a discovery contract.
+  const description = command === 'idea'
+    ? 'Mature a rough or mature idea into an execution-ready plan before starting a scope'
+    : getCommandDescription(command);
+  return `---\ndescription: ${JSON.stringify(description)}\n---\n\nLoad \`${OPENCODE_SKILLS_ROOT}/kyro-${command}/SKILL.md\` and follow it. The skill must read \`${KYRO_COMMANDS_ROOT}/${command}.md\` first, then load only the routed Kyro mode/helper files.\n\nRuntime: \`${KYRO_ROOT}/\`\nArtifacts: \`${ARTIFACT_ROOT}/{scope}/\`\n\nDo not inline the full Kyro workflow or ask the user to restate it.\n`;
 }
 
 function buildOpenCodeSettingsOverlay(): Record<string, unknown> {
