@@ -195,6 +195,13 @@ export function buildCliRecipes(scope: string, sprint: SprintFile, task: Task | 
         purpose: 'Materialize next sprint from a lean plan file',
         command: `${cli} plan --from <lean-sprint.json> ${scopeFlag}`,
       });
+      if (!sprint.activeSprint) {
+        recipes.push({
+          id: 'scope-complete',
+          purpose: 'Explicitly complete the scope when the work is done (not retirement)',
+          command: `${cli} scope complete ${scopeFlag} [--summary "..."] --yes`,
+        });
+      }
       break;
     case 'clarify':
       recipes.push({

@@ -10,6 +10,8 @@ Generate a lean sprint-plan input and let `{{KYRO_CLI}} plan` materialize the ne
 
 ## Workflow
 
+If the user asked to complete/close the scope (work is done, no more sprints) rather than plan the next one: do not generate Sprint N+1. Preview `{{KYRO_CLI}} scope complete --kyro-scope {scope}` (no `--yes`), confirm, then `--yes`. Never treat that as retirement.
+
 1. Resolve the next sprint number `N` from `roadmap.sprints` and `ledger[]` (highest closed + 1). Verify Sprint N-1 is closed when N > 1.
 2. Extract roadmap focus, type, target version, and suggested phases for Sprint N.
 3. For Sprint 2+, account for every previous recommendation from the last `ledger[]` entry: incorporate, defer, resolve, mark N/A, or convert to a phase. Nothing is silently dropped.

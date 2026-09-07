@@ -89,7 +89,7 @@ export function buildCommandSkill(command: KyroCommandName): string {
   return [
     '---',
     `name: kyro-${command}`,
-    `description: ${description}`,
+    `description: ${JSON.stringify(description)}`,
     'license: Apache-2.0',
     'metadata:',
     '  author: synapsync',
@@ -109,8 +109,8 @@ export function buildCommandSkill(command: KyroCommandName): string {
     '',
     'Always prefer this projected runtime over any host plugin cache path (older version trees under plugin caches are not the SoT).',
     '',
-    'CLI workflow: invoke via the CLI line above (or the same form in runtime modes): `status`, `doctor --artifacts`, `analyze`, `scenario add|link`, `record-evidence`, `review`, `repair`, `close-sprint`, `plan --from`.',
-    'Scope retirement is operator-only: only the `kyro-scope-retire` router may prepare it, pause for fresh human approval, and then invoke `scope retire` apply.',
+    'CLI workflow: invoke via the CLI line above (or the same form in runtime modes): `status`, `doctor --artifacts`, `analyze`, `scenario add|link`, `record-evidence`, `review`, `repair`, `close-sprint`, `plan --from`, `scope complete`.',
+    'Finished-scope completion is Forge-owned (`scope complete`). Retirement of an obsolete scope is operator-only: only the `kyro-scope-retire` router may prepare it, pause for fresh human approval, and then apply.',
     `Install/update Kyro: only via the full npm package (\`npx kyro-ai install …\` or global \`kyro install\`). Do not treat \`${KYRO_ROOT}\` as the install source.`,
     '',
     'Do not ask the user to restate this workflow in natural language.',
@@ -126,12 +126,12 @@ export function parseSkillRuntimeVersion(skillMarkdown: string): string | null {
   return value ? value : null;
 }
 
-function getCommandDescription(command: KyroCommandName): string {
-  if (command === 'forge') return 'Run the Kyro forge workflow through the installed workspace harness';
+export function getCommandDescription(command: KyroCommandName): string {
+  if (command === 'forge') return 'Route Kyro sprint work: plan, execute, review, close a sprint, or complete a finished scope. Not for obsolete or superseded scopes.';
   if (command === 'status') return 'Show Kyro project status through the installed workspace harness';
   if (command === 'idea') return 'Mature a rough or mature idea into an evidence-grounded, execution-ready pre-scope plan (optional)';
   if (command === 'qa') return 'Certify a scope\'s implementation and planning against its full specification (independent audit)';
-  if (command === 'scope-retire') return 'Prepare and human-authorize an auditable terminal scope retirement';
+  if (command === 'scope-retire') return 'Permanently retire an obsolete, superseded, or discarded Kyro scope. Irreversible. Not for finished work.';
   return 'Generate a fresh-context prompt for continuing Kyro work';
 }
 

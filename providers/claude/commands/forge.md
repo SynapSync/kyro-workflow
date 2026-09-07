@@ -1,5 +1,5 @@
 ---
-description: Route the Kyro forge workflow with progressive disclosure
+description: "Route Kyro sprint work: plan, execute, review, close a sprint, or complete a finished scope. Not for obsolete or superseded scopes."
 argument-hint: <scope or request>
 ---
 

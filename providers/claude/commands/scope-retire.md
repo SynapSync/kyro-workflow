@@ -1,5 +1,5 @@
 ---
-description: Prepare and human-authorize an auditable terminal scope retirement
+description: Permanently retire an obsolete, superseded, or discarded Kyro scope. Irreversible. Not for finished work.
 argument-hint: [scope-name]
 ---
 

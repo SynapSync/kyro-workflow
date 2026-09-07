@@ -209,7 +209,7 @@ function runScopeRetire(args: ScopeRetireArgs): void {
   printRetirementPlan(preparation);
   if (!args.digest && !args.yes) {
     console.log('\nPreparation complete. No files changed. Human approval is required before apply.');
-    console.log(`Approval question: ¿Autorizas retirar el scope \`${args.scope}\` con este plan?`);
+    console.log(`Approval question: ¿Autorizas retirar de forma irreversible el scope \`${args.scope}\` (obsoleto, reemplazado o descartado) con este plan?`);
     return;
   }
   if (!args.digest || !args.yes) {

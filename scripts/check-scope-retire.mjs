@@ -169,7 +169,7 @@ try {
     const prepared = prepare(root);
     assert(prepared.text.includes('Preparation complete. No files changed.'), 'prepare must state that it did not write');
     assert(
-      prepared.text.includes('¿Autorizas retirar el scope `demo` con este plan?'),
+      prepared.text.includes('¿Autorizas retirar de forma irreversible el scope `demo` (obsoleto, reemplazado o descartado) con este plan?'),
       'prepare must ask the exact approval question',
     );
     assert(digestTree(join(root, '.agents')) === before, 'prepare must not change any managed file');
@@ -362,8 +362,14 @@ try {
   // Projected workflow owns the human pause and no Forge/routing/handoff path auto-invokes apply.
   {
     const router = readFileSync(resolve(repo, 'commands/scope-retire.md'), 'utf-8');
-    assert(router.includes('¿Autorizas retirar el scope `<scope>` con este plan?'), 'router must contain the exact approval question');
+    assert(router.includes('¿Autorizas retirar de forma irreversible el scope `<scope>` (obsoleto, reemplazado o descartado) con este plan?'), 'router must contain the exact approval question');
     assert(/STOP/i.test(router), 'router must explicitly stop after asking for approval');
+    assert(router.includes('## Not completion'), 'router must refuse completion language');
+    assert(router.includes('scope complete'), 'router must send completion language to Forge');
+    const forge = readFileSync(resolve(repo, 'commands/forge.md'), 'utf-8');
+    assert(forge.includes('scope complete'), 'forge must route finished-scope closure to scope complete');
+    assert(/User intent/i.test(forge), 'forge must overlay user intent before nextAction');
+    assert(!forge.includes('scope retire'), 'forge must not auto-route retirement');
     const forbiddenRoots = ['agents', 'internal/skills/sprint-forge', 'commands/forge.md', 'commands/task-context.md'];
     for (const rootName of forbiddenRoots) {
       const path = resolve(repo, rootName);
@@ -373,6 +379,19 @@ try {
         assert(!text.includes('scope retire'), `${relative(repo, file)} must not auto-route scope retirement`);
       }
     }
+  }
+
+  // Idle plan_sprint packs must advertise explicit completion (not only plan --from).
+  {
+    const root = workspace();
+    const pack = run(root, ['context-pack', '--kyro-scope', 'demo', '--json']);
+    assert(pack.status === 0, `context-pack must succeed: ${output(pack)}`);
+    const recipes = JSON.parse(pack.stdout).data.cliRecipes;
+    assert(recipes.some((r) => r.id === 'plan-from'), 'idle plan_sprint pack must still offer plan');
+    assert(
+      recipes.some((r) => r.id === 'scope-complete' && String(r.command).includes('scope complete')),
+      'idle plan_sprint pack must offer scope complete',
+    );
   }
 
   // Explicit scope completion (T2.2): a confirmed tool-owned transition, distinct from retirement.
@@ -439,7 +458,12 @@ try {
     assert(statusJson.retirement === null, 'status must not conflate completion with retirement');
     const context = run(root, ['context-pack', '--kyro-scope', 'demo', '--json']);
     assert(context.status === 0, `context-pack must understand completed scopes: ${output(context)}`);
-    assert(JSON.parse(context.stdout).data.nextAction === 'done', 'context-pack must terminate at done');
+    const donePack = JSON.parse(context.stdout).data;
+    assert(donePack.nextAction === 'done', 'context-pack must terminate at done');
+    assert(
+      !(donePack.cliRecipes ?? []).some((r) => r.id === 'scope-complete'),
+      'done pack must not offer scope complete',
+    );
 
     // Completion cannot be applied twice, and a completed scope cannot be retired without a conflict.
     const twice = run(root, ['scope', 'complete', '--kyro-scope', 'demo', '--summary', 'again', '--yes']);
