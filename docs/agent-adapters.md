@@ -45,7 +45,7 @@ There is intentionally no generic adapter. Root `AGENTS.md` is the standard cros
 | task context | `kyro-task-context` | `/kyro:task-context` |
 | idea maturation and executable planning | `kyro-idea` | `/kyro:idea` |
 | certification and quality audit | `kyro-qa` | `/kyro:qa` |
-| human-gated scope retirement | `kyro-scope-retire` | `/kyro:scope-retire` |
+| human-gated retirement of an obsolete scope | `kyro-scope-retire` | `/kyro:scope-retire` |
 
 Each skill loads its command router first. The router then names the exact mode/helper/template needed for the current step.
 
@@ -58,7 +58,8 @@ Beyond command-skill routing, Kyro ships tool-owned CLI verbs that mutate scope 
 - `kyro review <task> --kyro-scope <scope> --verdict pass|fail ...` — record a checker verdict
 - `kyro debt add|start|resolve|defer|escalate` — mutate `sprint.json.debt[]`
 - `kyro add-emergent --title <t> --description <d> --acceptance <a> ...` — append a task discovered mid-sprint
-- `kyro scope retire --kyro-scope <scope> --reason <reason>` — prepare a read-only retirement plan;
+- `kyro scope complete --kyro-scope <scope> [--summary "..."] --yes` — explicit finished-scope completion, routed by Forge; not retirement
+- `kyro scope retire --kyro-scope <scope> --reason <reason>` — prepare a read-only retirement plan for an obsolete/superseded/discarded scope;
   a human must approve its exact digest before the separate `--digest <sha256> --yes` apply
 
 See [cli.md](cli.md) for full syntax and [maker-checker.md](maker-checker.md) for the evidence/review contract.

@@ -1,12 +1,19 @@
 ---
-description: Prepare and human-authorize an auditable terminal scope retirement
+description: Permanently retire an obsolete, superseded, or discarded Kyro scope. Irreversible. Not for finished work.
 argument-hint: [scope-name]
 ---
 
 # /kyro:scope-retire — Human-gated router
 
-Retirement is an exclusively human decision. This router never infers it from scope state,
-`handoff.nextAction`, Forge, automation, or a previous request.
+Retirement is an exclusively human decision for an **obsolete, superseded, or discarded** scope.
+This router never infers it from scope state, `handoff.nextAction`, Forge, automation, "cierre",
+"close", "complete", "finish", or a previous request.
+
+## Not completion
+
+If the user asked to close, complete, finish, or mark the objective met (including "cierre del
+scope" or "we're done"): do not prepare retirement. Tell them to continue in `/kyro:forge`, which
+runs `scope complete`. Stop.
 
 ## Preparation — always first, read-only
 
@@ -18,7 +25,7 @@ Retirement is an exclusively human decision. This router never infers it from sc
 
 3. Present the complete output: current state, reason, successor, affected files, validations and
    plan digest. Do not edit any Kyro-managed file.
-4. Ask exactly: “¿Autorizas retirar el scope `<scope>` con este plan?”
+4. Ask exactly: “¿Autorizas retirar de forma irreversible el scope `<scope>` (obsoleto, reemplazado o descartado) con este plan?”
 5. Stop and wait. Do not run an apply command in the same interaction.
 
 ## Apply — only after fresh, unequivocal human approval

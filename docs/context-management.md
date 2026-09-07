@@ -70,7 +70,7 @@ Scope packs read `sprint.json` directly. Task packs add the matching task object
 
 Each pack includes budget routing from `config.json` `budgetClasses`: `budgetClass`, `reasoningTier`, `maxContextTokens`, and `budgetGuidance`. Selection follows `sprint.json.handoff.nextAction` and pack mode — for example, `execute_task` maps to the `execute` class.
 
-JSON packs also include **`cliRecipes[]`**: copy-paste commands for the current `nextAction` (plus `status` / `doctor --artifacts` preflight), built with the canonical agent CLI entrypoint from the global runtime manifest. Prefer recipes over re-discovering invocation or re-inflating skill stubs.
+JSON packs also include **`cliRecipes[]`**: copy-paste commands for the current `nextAction` (plus `status` / `doctor --artifacts` preflight), built with the canonical agent CLI entrypoint from the global runtime manifest. An idle `plan_sprint` pack (no active sprint) also offers `scope complete` so finishing the work is visible without inferring it from the roadmap. Prefer recipes over re-discovering invocation or re-inflating skill stubs.
 
 Prefer scope packs at session start. Prefer task packs when executing a specific sprint task. Use bare `--task` to default to the sprint's next pending task.
 

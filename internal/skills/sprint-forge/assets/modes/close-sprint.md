@@ -46,8 +46,9 @@ sprint must start in a **fresh session** — continuing here carries the whole s
 biggest cost driver across a multi-sprint run. Do NOT auto-start the next sprint now. Generate the
 continuation prompt via the task-context capability (`/kyro:task-context`, or the
 `kyro-task-context` skill) and present it in a fenced block for the user to paste into a new
-session. When the CLI reports `Next action: done`, the scope is terminal (historical completion or
-retirement companion) — no more sprints to plan; only that explicit signal completes a scope.
+session. If the user asked to complete the scope after this close, do not plan the next sprint and
+do not retire: preview `{{KYRO_CLI}} scope complete --kyro-scope {scope}`, confirm, then `--yes`.
+When the CLI reports `Next action: done`, the scope is already terminal (completion or retirement).
 
 ## Rules
 

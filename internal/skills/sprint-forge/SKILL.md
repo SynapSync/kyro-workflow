@@ -104,11 +104,14 @@ Irreversible or schema-critical operations are CLI-owned, never hand-rolled:
 | `{{KYRO_CLI}} repair --kyro-scope <scope>` | Normalizes `sprint.json` formatting. |
 | `{{KYRO_CLI}} clarify --from <file> --kyro-scope <scope>` | Records one or more accepted clarification decisions and safely advances routing when clear. |
 | `{{KYRO_CLI}} rule add ... [--global]` | Adds a scope rule; `--global` also writes `project.json` after approval. |
+| `{{KYRO_CLI}} scope complete --kyro-scope <scope>` | Explicit finished-scope completion (Forge overlay). Not retirement. |
 
 Claude Code's `PreToolUse` hook adds host-specific defense against manual managed-state writes. Other
 hosts may not expose an equivalent hook, so correctness never depends on it.
 
 ## Routing (handoff.nextAction → mode)
+
+User intent to complete/close a finished scope is `{{KYRO_CLI}} scope complete` (Forge overlay), not a `nextAction` and not retirement. `done` means already terminal.
 
 | nextAction | Load |
 |------------|------|
@@ -118,7 +121,7 @@ hosts may not expose an equivalent hook, so correctness never depends on it.
 | `execute_task` | `modes/SPRINT.md`, `modes/execute-task.md` |
 | `review_task` | `modes/SPRINT.md`, `modes/review-task.md`, `helpers/reviewer.md` |
 | `close_sprint` | `modes/SPRINT.md`, `modes/close-sprint.md`, `helpers/debt-tracker.md` + `helpers/learner.md` as needed |
-| `done` | Stop — scope complete. No work mode. |
+| `done` | Stop — already complete or retired. No work mode. |
 | status report | `modes/STATUS.md` |
 | inconsistent | `modes/recover.md` |
 
