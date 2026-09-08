@@ -29,7 +29,7 @@ export function selectBudgetClass(packMode: ContextPackMode, nextAction: string 
   if (nextAction === 'close_sprint') return 'close';
   if (nextAction === 'review_task') return 'review';
   if (packMode === 'task' || nextAction === 'execute_task') return 'execute';
-  if (nextAction === 'plan_sprint' || nextAction === 'status' || nextAction === 'done') return 'brief';
+  if (nextAction === 'plan_sprint' || nextAction === 'await_scope_completion' || nextAction === 'status' || nextAction === 'done') return 'brief';
   return 'brief';
 }
 

@@ -6,6 +6,26 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+
+- **Exhausted roadmaps await an explicit decision.** Closing the final roadmap sprint now writes
+  `handoff.nextAction: await_scope_completion`, rather than falsely routing to `plan_sprint`.
+  Forge and context packs present the two valid choices: confirmed scope completion (preview,
+  then explicit confirmation) or explicit expansion with a new sprint. Scope status remains
+  `planning`; no completion is inferred and no planning mode is auto-loaded.
+- **Historical close checkpoints keep verifying.** The new `await-scope-decision` policy is
+  separate from the exact historical `open-scope` transition, so the verifier still accepts
+  checkpoints written by 4.48.0/4.48.1 (including the legacy `plan_sprint` final close) byte
+  for byte. Tampered after-images are still rejected, including rehashed tampering.
+- **Real end-to-end coverage for the exhausted-roadmap path.** Adds frozen cross-version close
+  fixtures (with provenance, retries and tamper rejection) plus a real close → checkpoint →
+  decision → explicit expansion regression. `plan --help` now documents both `plan_sprint` and
+  `await_scope_completion`.
+
+  Compatibility note: Kyro Lens support for the new `await_scope_completion` action is deferred
+  to a later Lens release and is out of scope for this version. Existing scopes are not migrated;
+  use the CLI until then.
+
 ## [4.48.1] - 2026-09-07
 
 ### Fixed

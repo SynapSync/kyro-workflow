@@ -381,16 +381,18 @@ try {
     }
   }
 
-  // Idle plan_sprint packs must advertise explicit completion (not only plan --from).
+  // Roadmap exhaustion packs must advertise explicit completion and expansion.
   {
     const root = workspace();
     const pack = run(root, ['context-pack', '--kyro-scope', 'demo', '--json']);
     assert(pack.status === 0, `context-pack must succeed: ${output(pack)}`);
     const recipes = JSON.parse(pack.stdout).data.cliRecipes;
-    assert(recipes.some((r) => r.id === 'plan-from'), 'idle plan_sprint pack must still offer plan');
+    const data = JSON.parse(pack.stdout).data;
+    assert(data.nextAction === 'await_scope_completion', 'exhausted roadmap must await completion');
+    assert(recipes.some((r) => r.id === 'plan-from'), 'decision pack must offer explicit expansion');
     assert(
       recipes.some((r) => r.id === 'scope-complete' && String(r.command).includes('scope complete')),
-      'idle plan_sprint pack must offer scope complete',
+      'decision pack must offer scope complete',
     );
   }
 
@@ -809,8 +811,8 @@ try {
     const partialClose = run(root, ['close-sprint', '--kyro-scope', 'demo', '--outcome', 'partial', '--yes']);
     assert(partialClose.status === 0, `a disposed sprint must close partially: ${output(partialClose)}`);
     const partial = json(scopePath(root));
-    assert(partial.ledger.at(-1)?.outcome === 'partial' && partial.handoff.nextAction === 'plan_sprint',
-      'a partial final sprint must stay open and route to normal planning');
+    assert(partial.ledger.at(-1)?.outcome === 'partial' && partial.handoff.nextAction === 'await_scope_completion',
+      'a partial final sprint must await an explicit completion-or-expansion decision');
     const partialCheckpoint = readdirSync(scopePath(root, 'archive')).find((file) => file.endsWith('.checkpoint.json'));
     assert(partialCheckpoint, 'the partial close must create an immutable checkpoint');
     const partialBeforeClose = json(join(scopePath(root, 'archive'), partialCheckpoint)).beforeClose;
@@ -841,7 +843,7 @@ try {
     assert(review.status === 0, `follow-up work must be reviewed through the CLI: ${output(review)}`);
     const followUpClose = run(root, ['close-sprint', '--kyro-scope', 'demo', '--outcome', 'shipped', '--yes']);
     assert(followUpClose.status === 0, `the fully verified follow-up sprint must close: ${output(followUpClose)}`);
-    assert(json(scopePath(root)).handoff.nextAction === 'plan_sprint', 'closing the follow-up must still not infer scope completion');
+    assert(json(scopePath(root)).handoff.nextAction === 'await_scope_completion', 'closing the follow-up must await a completion-or-expansion decision');
     assert(digestTree(scopePath(root, 'archive')) !== archiveAfterPartialClose, 'the later close must add its own immutable checkpoint');
     const archiveBeforeCompletion = digestTree(scopePath(root, 'archive'));
 

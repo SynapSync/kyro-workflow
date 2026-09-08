@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 4,
+  "scope": "demo",
+  "title": "Demo",
+  "status": "planning",
+  "objective": "Demo objective",
+  "successCriteria": ["Demo works."],
+  "clarifications": [],
+  "conventions": [],
+  "roadmap": { "plannedSprintCount": 1, "sizingRationale": "One sprint is enough.", "sprints": [{ "n": 1, "slug": "demo-sprint", "title": "Demo Sprint", "state": "active" }] },
+  "ledger": [],
+  "previousSprint": null,
+  "activeSprint": null,
+  "debt": [],
+  "handoff": { "nextAction": "await_scope_completion", "nextTaskId": null, "blockers": [], "note": "Resume demo.", "lastUpdated": "2026-07-02" }
+}

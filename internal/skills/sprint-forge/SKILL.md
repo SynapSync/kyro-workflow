@@ -118,6 +118,7 @@ User intent to complete/close a finished scope is `{{KYRO_CLI}} scope complete` 
 | `init` (no sprint.json) | `modes/INIT.md` + one `helpers/analysis/{workType}.md` |
 | `clarify` | `modes/clarify.md` |
 | `plan_sprint` | `modes/SPRINT.md`, `modes/plan-sprint.md`, then `helpers/sprint-generator.md` |
+| `await_scope_completion` | Ask: complete the finished scope, or explicitly expand it. Complete → `scope complete`; expand → then route as `plan_sprint`. |
 | `execute_task` | `modes/SPRINT.md`, `modes/execute-task.md` |
 | `review_task` | `modes/SPRINT.md`, `modes/review-task.md`, `helpers/reviewer.md` |
 | `close_sprint` | `modes/SPRINT.md`, `modes/close-sprint.md`, `helpers/debt-tracker.md` + `helpers/learner.md` as needed |

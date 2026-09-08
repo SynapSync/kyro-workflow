@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 4,
+  "scope": "demo",
+  "title": "Demo",
+  "status": "planning",
+  "objective": "Demo objective",
+  "successCriteria": [
+    "Demo works."
+  ],
+  "clarifications": [],
+  "conventions": [],
+  "roadmap": {
+    "plannedSprintCount": 2,
+    "sizingRationale": "One sprint is enough.",
+    "sprints": [
+      {
+        "n": 1,
+        "slug": "demo-sprint",
+        "title": "Demo Sprint",
+        "state": "closed"
+      },
+      {
+        "n": 2,
+        "slug": "next",
+        "title": "Next",
+        "state": "planned"
+      }
+    ]
+  },
+  "ledger": [
+    {
+      "n": 1,
+      "slug": "demo-sprint",
+      "outcome": "partial",
+      "closedAt": "2026-09-08",
+      "archive": "archive/sprint-001-demo-sprint.md",
+      "snapshot": "archive/sprint-001-demo-sprint.json",
+      "checkpoint": "archive/sprint-001-demo-sprint.checkpoint.json",
+      "checkpointSha256": "18f1b650683ba983f2c93420584feeb0f2184d600c2642317caacd2385dfa2ba"
+    }
+  ],
+  "previousSprint": {
+    "n": 1,
+    "slug": "demo-sprint",
+    "outcome": "partial",
+    "summary": "Ship demo sprint."
+  },
+  "activeSprint": null,
+  "debt": [],
+  "handoff": {
+    "nextAction": "plan_sprint",
+    "nextTaskId": null,
+    "blockers": [],
+    "note": "Human-provided close note; preserve exactly.",
+    "lastUpdated": "2026-09-08"
+  }
+}

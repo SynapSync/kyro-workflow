@@ -19,6 +19,8 @@ export const ROUTING_TABLE = {
   init: { modes: ['INIT.md'] },
   clarify: { modes: ['SPRINT.md', 'clarify.md'] },
   plan_sprint: { modes: ['SPRINT.md', 'plan-sprint.md'] },
+  /** Roadmap exhausted: explicit user choice is required before further work. */
+  await_scope_completion: { modes: [] },
   execute_task: { modes: ['SPRINT.md', 'execute-task.md'] },
   review_task: { modes: ['SPRINT.md', 'review-task.md'] },
   close_sprint: { modes: ['SPRINT.md', 'close-sprint.md'] },

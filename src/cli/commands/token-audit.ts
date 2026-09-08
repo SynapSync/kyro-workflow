@@ -17,14 +17,15 @@ const TOKEN_BUDGET = {
   startupTokens: 1500,
   statusBriefTokens: 2000,
   initHappyPathTokens: 2000,
-  orchestratorWords: 800,
+  // The explicit post-roadmap decision adds 21 words; 825 leaves four words of headroom.
+  orchestratorWords: 825,
   // 4.42.0 raised this from 800: SKILL.md now carries the full Step 0 startup handshake, because
   // the skill is invocable on its own and the orchestrator — which held the only copy — never
   // loads on that path. Buying it back by trimming the contract was the wrong trade; a scope
   // hand-authored without the handshake costs far more than the tokens it saves.
-  // Forge now carries the completion-vs-retirement routing contract for standalone invocation.
-  // 1330 leaves 11 words above the measured 1319-word asset.
-  sprintForgeSkillWords: 1330,
+  // Forge carries completion-vs-retirement plus the post-roadmap decision contract.
+  // 1350 leaves eight words above the measured 1342-word asset.
+  sprintForgeSkillWords: 1350,
   seedbedSkillWords: 700,
   seedbedModeWords: 900,
   seedbedHelperWords: 450,
@@ -39,17 +40,16 @@ const TOKEN_BUDGET = {
   // 4.47.0 raised this from 4180: Forge/orchestrator/SKILL now diagnose integrity *before*
   // scope resolution. That step is load-bearing for an empty activeScope; trimming it to
   // keep the old ceiling would leave recovery unreachable on the execute route.
-  // Completion intent routing is loaded with every Forge path. CI measures the projected Forge
-  // skill (not the shorter local stub): plan=5076, execute=4544, review=4701, close=5730.
-  // Keep only 6–10 tokens of headroom above those installed-runtime paths.
-  runtimeForgeExecuteTokens: 4550,
-  runtimeForgeReviewTokens: 4710,
-  runtimeForgePlanTokens: 5085,
+  // CI measures projected runtime paths. The post-roadmap decision measures init=5101,
+  // init-seedbed=5431, plan=5191, execute=4659, review=4816; retain 9–11 tokens of headroom.
+  runtimeForgeExecuteTokens: 4670,
+  runtimeForgeReviewTokens: 4825,
+  runtimeForgePlanTokens: 5200,
   runtimeForgeCloseTokens: 5740,
-  runtimeForgeInitTokens: 5010,
+  runtimeForgeInitTokens: 5110,
   // Seedbed-backed INIT adds one lazy mapping helper to the normal INIT route. The ceiling keeps
   // roughly 10% headroom over the measured router + orchestrator + skill + mode + analysis + mapping path.
-  runtimeForgeInitSeedbedTokens: 5370,
+  runtimeForgeInitSeedbedTokens: 5440,
   runtimeTaskContextTokens: 2200,
   runtimeIdeaTokens: 5200,
 } as const;

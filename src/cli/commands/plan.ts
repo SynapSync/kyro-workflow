@@ -68,7 +68,7 @@ export interface LeanSprintInput {
 /**
  * Mode is detected from scope state, not from the `--from` file shape: a scope with no sprint.json
  * yet is init mode; a scope with a valid sprint.json that has no active sprint and is ready
- * (handoff.nextAction === 'plan_sprint') is sprint mode. Both modes need a resolved scope first
+ * (handoff.nextAction is plan_sprint or await_scope_completion) is sprint mode. Both modes need a resolved scope first
  * (from --kyro-scope, or the lean file's own "scope" field for init mode), so that resolution
  * happens once, up front, before we know which mode we are in.
  */
@@ -120,7 +120,7 @@ export function runPlanCommand(rawArgs: string[]): void {
       'Close it with kyro close-sprint before planning the next sprint.',
     );
   }
-  if (currentSprint.handoff.nextAction !== 'plan_sprint') {
+  if (currentSprint.handoff.nextAction !== 'plan_sprint' && currentSprint.handoff.nextAction !== 'await_scope_completion') {
     throw new KyroCoreError(
       'NOT_READY_TO_PLAN',
       `Scope "${scope}" is not ready to plan a sprint (nextAction=${currentSprint.handoff.nextAction}).`,
@@ -137,7 +137,7 @@ export function runPlanCommand(rawArgs: string[]): void {
 function planRemedy(sprint: SprintFile, scope: string): string {
   if (sprint.retirement) return 'This scope is retired and terminal. Plan the follow-on work in a new scope.';
   if (sprint.completion) return `This scope is explicitly completed. Run kyro scope reopen --kyro-scope ${scope} --reason "<why>" --yes to return it to planning.`;
-  return 'Resolve the current handoff first (e.g. clarify, or done means the scope is complete).';
+  return 'Resolve the current handoff first (e.g. clarify; done means the scope is complete).';
 }
 
 function runPlanInitMode(raw: unknown, scope: string, args: PlanArgs, state: KyroProjectState): void {
@@ -760,10 +760,11 @@ Two modes, auto-detected from the resolved scope's state (not from the --from fi
     sprint.json.author { name?, email?, source: "git", capturedAt } with usable fields only
     (malformed email dropped). Omits author when nothing usable remains. Never blocks init —
     author is best-effort only. Not accepted from the lean file (machine identity at write time).
-  - sprint mode: sprint.json exists, activeSprint is null, and handoff.nextAction is "plan_sprint".
+  - sprint mode: sprint.json exists, activeSprint is null, and handoff.nextAction is "plan_sprint"
+    or "await_scope_completion" (invoking plan explicitly chooses scope expansion).
     Materializes the next activeSprint (phases/tasks all pending) from a lean sprint-plan file.
     Refuses with SPRINT_ALREADY_ACTIVE if a sprint is already active, or NOT_READY_TO_PLAN if the
-    handoff isn't at plan_sprint yet. Writes only sprint.json (preserves existing author).
+    handoff isn't at plan_sprint or await_scope_completion. Writes only sprint.json (preserves existing author).
 Both modes are tool-owned and validated, so the agent never hand-writes the full v4 document.
 
 Init-mode lean plan file shape:

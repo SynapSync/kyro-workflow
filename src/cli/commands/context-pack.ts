@@ -198,10 +198,22 @@ export function buildCliRecipes(scope: string, sprint: SprintFile, task: Task | 
       if (!sprint.activeSprint) {
         recipes.push({
           id: 'scope-complete',
-          purpose: 'Explicitly complete the scope when the work is done (not retirement)',
-          command: `${cli} scope complete ${scopeFlag} [--summary "..."] --yes`,
+          purpose: 'Preview completion; ask for human confirmation before --yes (not retirement)',
+          command: `${cli} scope complete ${scopeFlag} [--summary "..."]`,
         });
       }
+      break;
+    case 'await_scope_completion':
+      recipes.push({
+        id: 'scope-complete',
+        purpose: 'Preview completion; ask for human confirmation before --yes (not retirement)',
+        command: `${cli} scope complete ${scopeFlag} [--summary "..."]`,
+      });
+      recipes.push({
+        id: 'plan-from',
+        purpose: 'Expand the scope with an explicitly requested next sprint',
+        command: `${cli} plan --from <lean-sprint.json> ${scopeFlag}`,
+      });
       break;
     case 'clarify':
       recipes.push({

@@ -39,16 +39,11 @@ Use `--dry-run` first if you want to review the plan. Do not replicate this by h
 
 ## Hand off for a fresh session
 
-After the CLI reports `Next action: plan_sprint`, the scope stays **open for planning** — even when
-every originally planned roadmap sprint has been closed. A roadmap is an estimate, not a completion
-contract; scope completion is an explicit decision, not a side effect of exhausting it. The next
-sprint must start in a **fresh session** — continuing here carries the whole session's context, the
-biggest cost driver across a multi-sprint run. Do NOT auto-start the next sprint now. Generate the
-continuation prompt via the task-context capability (`/kyro:task-context`, or the
-`kyro-task-context` skill) and present it in a fenced block for the user to paste into a new
-session. If the user asked to complete the scope after this close, do not plan the next sprint and
-do not retire: preview `{{KYRO_CLI}} scope complete --kyro-scope {scope}`, confirm, then `--yes`.
-When the CLI reports `Next action: done`, the scope is already terminal (completion or retirement).
+`Next action: plan_sprint` means roadmap work remains; begin it in a **fresh session** using the
+task-context capability (`/kyro:task-context` or `kyro-task-context`). When the roadmap is exhausted,
+Kyro reports `await_scope_completion`: ask whether to complete or explicitly expand the scope. Do
+not auto-start another sprint or retire it. Completion previews `{{KYRO_CLI}} scope complete
+--kyro-scope {scope}`, then requires confirmation and `--yes`. `done` is already terminal.
 
 ## Rules
 
