@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format is based on
 
 ### Fixed
 
+- **Forge no longer sends scope creation through repair/recovery.** The router startup used to
+  run `repair integrity prepare` against the resolved scope id before knowing whether the scope
+  exists, so every create-from-plan flow stopped on a false `irreconcilable` blocker. The
+  existence gate now comes first: a scope that is neither registered nor on disk is a creation
+  flow and routes straight to INIT without `repair` or `context-pack`; the repair preflight is
+  existing-scope-only, and recover mode is fenced to scopes that exist.
+
 - **Exhausted roadmaps await an explicit decision.** Closing the final roadmap sprint now writes
   `handoff.nextAction: await_scope_completion`, rather than falsely routing to `plan_sprint`.
   Forge and context packs present the two valid choices: confirmed scope completion (preview,

@@ -20,10 +20,11 @@ Kyro preserves quality by loading the smallest contract needed for the current l
    Use that value for every `{{KYRO_CLI}}` token this session; never run the literal token.
 2. Read `project.json` + `local.json`; unreadable stops here.
 3. Resolve scope from user input, `local.json.activeScope`, or the only directory under `.agents/kyro/scopes/`; ambiguous or none, ask first.
-4. Silently run `{{KYRO_CLI}} repair integrity prepare --kyro-scope <scope> --json` before `context-pack` (isolates unrelated drift; never omit `--kyro-scope`). Findings/blockers → load `assets/modes/recover.md` and stop. None → continue.
-5. Capability handshake: run `{{KYRO_CLI}} capabilities --json`. Unknown command, handshake failure, or a missing tool-owned verb means the runtime is unusable: ABORT without mutating Kyro state. Report the observed output of `{{KYRO_CLI}} --version` (or `not installed`) and the exact remedy `npx kyro-ai@latest sync --scope workspace --yes`. Never work around it by hand.
-6. Resolve routing with `{{KYRO_CLI}} context-pack --kyro-scope <scope> --json` (lean pack: `nextAction`, `nextTaskId`, `reviewPending`, conventions, budget). Do not open full `sprint.json` to route. No `sprint.json` → INIT.
-7. Load `skills/sprint-forge/SKILL.md`, then the single mode named by the pack's `nextAction`.
+4. A scope that does not exist yet — neither in `project.json` nor on disk — is creation, not corruption: skip `repair` and `context-pack`, load `assets/modes/INIT.md`, and never route it to recovery.
+5. Only for an existing scope, silently run `{{KYRO_CLI}} repair integrity prepare --kyro-scope <scope> --json` before `context-pack` (isolates unrelated drift; never omit `--kyro-scope`). Findings/blockers → load `assets/modes/recover.md` and stop. None → continue.
+6. Capability handshake: run `{{KYRO_CLI}} capabilities --json`. Unknown command, handshake failure, or a missing tool-owned verb means the runtime is unusable: ABORT without mutating Kyro state. Report the observed output of `{{KYRO_CLI}} --version` (or `not installed`) and the exact remedy `npx kyro-ai@latest sync --scope workspace --yes`. Never work around it by hand.
+7. Resolve routing with `{{KYRO_CLI}} context-pack --kyro-scope <scope> --json` (lean pack: `nextAction`, `nextTaskId`, `reviewPending`, conventions, budget). Do not open full `sprint.json` to route. No `sprint.json` → INIT.
+8. Load `skills/sprint-forge/SKILL.md`, then the single mode named by the pack's `nextAction`.
 
 Open the full `sprint.json` only when `plan_sprint`/`close_sprint`/status-full needs its planning or reporting context (see SKILL.md Read Path Contract). Agents never open it in order to write it.
 

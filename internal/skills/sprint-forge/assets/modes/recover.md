@@ -1,5 +1,7 @@
 # Recover Mode
 
+Recover is only for scopes that exist (registered in `project.json` or present on disk). A scope that is neither is a creation flow: load `INIT.md` instead and never run `repair` for it.
+
 Recover when `sprint.json` is missing/unparseable, or when `repair integrity prepare` reports findings.
 
 ## Inputs
