@@ -74,10 +74,11 @@ The argument describes what to analyze or work on. It can be a path, a module na
 
 ```text
 no roadmap       -> INIT.md
-no active sprint -> plan-sprint.md
+plan_sprint      -> plan-sprint.md
 pending tasks    -> execute-task.md
 validation       -> review-task.md
 closeout         -> close-sprint.md
+roadmap exhausted -> ask: complete or expand
 already terminal -> stop (done)
 inconsistent     -> recover.md
 ```

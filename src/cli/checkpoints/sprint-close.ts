@@ -175,7 +175,7 @@ export function deriveSprintCloseTransition(
     legacySnapshotPath,
     narrativePath,
     checkpointPath,
-    'open-scope',
+    'await-scope-decision',
   );
 }
 
@@ -212,7 +212,7 @@ function deriveSprintCloseTransitionWithPolicy(
   legacySnapshotPath: string,
   narrativePath: string,
   checkpointPath: string,
-  policy: 'open-scope' | 'legacy-roadmap-exhaustion',
+  policy: 'await-scope-decision' | 'open-scope' | 'legacy-roadmap-exhaustion',
 ): { intendedAfterClose: SprintFile; projectScopeAfter: KyroScopeEntry } {
   const active = beforeClose.activeSprint;
   if (!active) throw new KyroCoreError('CHECKPOINT_CORRUPT', 'beforeClose.activeSprint must exist to derive a close transition.');
@@ -232,7 +232,7 @@ function deriveSprintCloseTransitionWithPolicy(
   const remaining = roadmapSprints.filter((sprint) => sprint.state !== 'closed').length;
   const nextAction = policy === 'legacy-roadmap-exhaustion'
     ? (remaining > 0 ? 'plan_sprint' : 'done')
-    : 'plan_sprint';
+    : (policy === 'open-scope' || remaining > 0 ? 'plan_sprint' : 'await_scope_completion');
   const intendedAfterClose: SprintFile = {
     ...beforeClose,
     status: policy === 'legacy-roadmap-exhaustion'
@@ -254,12 +254,12 @@ function deriveSprintCloseTransitionWithPolicy(
       note: close.note ?? (
         policy === 'legacy-roadmap-exhaustion'
           ? `Sprint ${active.n} (${active.slug}) closed as ${close.outcome}. ${remaining > 0 ? `${remaining} sprint(s) remain.` : 'No sprints remain — scope objective met.'}`
-          : `Sprint ${active.n} (${active.slug}) closed as ${close.outcome}. Scope remains open for planning.`
+          : `Sprint ${active.n} (${active.slug}) closed as ${close.outcome}. ${policy === 'open-scope' || remaining > 0 ? 'Scope remains open for planning.' : 'Roadmap exhausted; await explicit scope completion or an expansion decision.'}`
       ),
       lastUpdated: closedAt,
     },
   };
-  if (policy === 'open-scope') {
+  if (policy !== 'legacy-roadmap-exhaustion') {
     intendedAfterClose.status = deriveScopeStatus(intendedAfterClose, false);
   }
   const projectScopeAfter: KyroScopeEntry = {
@@ -277,7 +277,11 @@ function stampCloseLedgerCommitment(
   if (last) last.checkpointSha256 = checkpointCommitment({ ...typed, intendedAfterClose: derived.intendedAfterClose });
 }
 
-/** Current writer, then the pre-T1.4 roadmap-exhaustion writer — never rewrite historical bytes. */
+/**
+ * Checkpoint v1 has no writer-policy field. Recognize only complete, exactly derived writer
+ * images: current decision, historical open-scope (including its default note), and legacy done.
+ * Never reinterpret open-scope as the new policy or rewrite historical bytes/commitments.
+ */
 function authorizeCloseTransition(
   typed: SprintCloseCheckpointV1,
   path: string,
@@ -294,6 +298,9 @@ function authorizeCloseTransition(
   const current = deriveSprintCloseTransition(...args);
   stampCloseLedgerCommitment(current, typed);
   if (canonicalJson(current.intendedAfterClose) === canonicalJson(typed.intendedAfterClose)) return current;
+  const openScope = deriveSprintCloseTransitionWithPolicy(...args, 'open-scope');
+  stampCloseLedgerCommitment(openScope, typed);
+  if (canonicalJson(openScope.intendedAfterClose) === canonicalJson(typed.intendedAfterClose)) return openScope;
   const historical = deriveHistoricalRoadmapExhaustionCloseTransition(...args);
   stampCloseLedgerCommitment(historical, typed);
   if (canonicalJson(historical.intendedAfterClose) === canonicalJson(typed.intendedAfterClose)) return historical;

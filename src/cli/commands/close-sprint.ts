@@ -145,6 +145,11 @@ function executeConfirmedClose(scope: string, args: CloseSprintArgs): void {
     console.log(`    sprint.json: ${sprintJsonPath(scope)}`);
     console.log(`    nextAction:  ${handoff.nextAction}`);
     if (handoff.note) console.log(`    note:        ${handoff.note}`);
+  } else if (handoff.nextAction === 'await_scope_completion') {
+    console.log('');
+    console.log('▶ Roadmap exhausted. Choose explicitly: complete the scope, or expand it with another sprint.');
+    console.log(`  Complete → preview: kyro scope complete --kyro-scope ${scope}; confirm, then rerun with --yes.`);
+    console.log('  Expand  → start /kyro:forge with the new sprint request.');
   } else if (handoff.nextAction === 'done') {
     console.log('');
     console.log('▶ Scope is terminal (historical completion or retirement). No further forge modes.');

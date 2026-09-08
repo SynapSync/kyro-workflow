@@ -14,7 +14,7 @@ enforced by `check:status`.
 |---|---|
 | `derivePhaseStatus(phase)` | no tasks → `pending`; any task `blocked` → `blocked`; all `done` → `done`; any `in_progress` or a done/pending mix → `active`; else `pending` |
 | `deriveActiveSprintStatus(active)` | no tasks → `planned`; all tasks still `pending` → `planned`; all `done` → `complete`; else `executing` |
-| `deriveScopeStatus(sprint, hasActiveSprint)` | `retirement` → `retired`; active sprint with a blocked task or `handoff.blockers` → `blocked`; active sprint → `active`; an explicit `completion` record, or `handoff.nextAction === 'done'` (legacy terminal read) → `completed`; else `planning`. Exhausting the original roadmap does not complete a scope. |
+| `deriveScopeStatus(sprint, hasActiveSprint)` | `retirement` → `retired`; active sprint with a blocked task or `handoff.blockers` → `blocked`; active sprint → `active`; an explicit `completion` record, or `handoff.nextAction === 'done'` (legacy terminal read) → `completed`; else `planning`. Exhausting the original roadmap yields `await_scope_completion`, still status `planning`, rather than completion. |
 
 These three signals answer different questions:
 
@@ -36,6 +36,7 @@ Three distinct facts, never inferred from each other and never inferred from the
 | Fact | Written by | Effect |
 |---|---|---|
 | **Completion** — the work is done | `kyro scope complete` (confirmed) | `completion` record, `status: completed`, `nextAction: done`. Reversible by reopening. |
+| **Await completion** — roadmap exhausted | `kyro close-sprint` (derived) | `status: planning`, `nextAction: await_scope_completion`; a human must complete or explicitly expand. |
 | **Reopen** — more work is needed | `kyro scope reopen` (confirmed) | clears `completion`, appends it to append-only `completionHistory` with the reason, `status: planning`, `nextAction: plan_sprint`. |
 | **Retirement** — the scope leaves the lifecycle | `kyro scope retire` (human-approved, digest-bound) | `retirement` record, `status: retired`, terminal. Never reopened. |
 
@@ -139,3 +140,17 @@ The CLI status command is intentionally read-only. Mutating debt intents such as
 `task.status` remains the progress leaf. Unfinished work that leaves a sprint is *not* another success-like status; it is an optional `task.disposition` (`deferred`, `blocked`, `superseded`, `cancelled`) written only by `kyro record-evidence`. Absence of the field is valid historical state and must not be inferred as a disposition.
 
 Disposition does not change `derivePhaseStatus` / `deriveActiveSprintStatus` / `deriveScopeStatus` in this increment. A non-blocked disposition must not be treated as verified completion (`done` + `pass`) and must not mint `handoff.nextAction: done`. Field owners, target rules, and checkpoint compatibility are in [adr-adaptive-sprint-lifecycle.md](plans/adr-adaptive-sprint-lifecycle.md).
+
+### Historical state and rollout compatibility
+
+The new decision action is written only by new sprint closes. Existing open scopes keep their
+stored `plan_sprint`; completed/retired scopes and immutable checkpoints are not migrated. The
+verifier recognizes exact historical close policies (including default notes), without rewriting
+archive bytes or weakening commitments. Status `planning` means open without an active sprint;
+`await_scope_completion` identifies the pending human decision, not completion eligibility.
+Partial delivery, debt and blockers still require the existing completion preconditions.
+
+Kyro Lens support for `await_scope_completion` is deferred and outside this release's scope.
+Older Lens parsers may reject this action; no new Lens label or compatibility is promised here.
+Use this Kyro CLI's status/context-pack for new decision states until Lens support is delivered.
+Do not convert historical `plan_sprint` states to the new action.

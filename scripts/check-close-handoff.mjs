@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Verifies close-sprint's post-close handoff guidance: every non-retired scope stays routable
-// to plan_sprint, including after its original roadmap is exhausted. Portable, deterministic
-// half of the fresh-context nudge.
+// Verifies close-sprint's post-close handoff guidance: roadmap work routes to plan_sprint;
+// exhaustion awaits an explicit completion-or-expansion decision. Portable, deterministic.
 import { spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -27,7 +26,11 @@ function sprintPath(root) {
 }
 
 function run(root, extra = []) {
-  return spawnSync(process.execPath, [cli, 'close-sprint', '--kyro-scope', 'demo', '--outcome', 'shipped', '--yes', ...extra], {
+  return command(root, ['close-sprint', '--kyro-scope', 'demo', '--outcome', 'shipped', '--yes', ...extra]);
+}
+
+function command(root, args) {
+  return spawnSync(process.execPath, [cli, ...args], {
     cwd: root,
     env: { ...process.env, HOME: join(root, '.home') },
     encoding: 'utf-8',
@@ -56,20 +59,44 @@ function run(root, extra = []) {
   }
 }
 
-// Case 2 — no original sprints remain -> plan_sprint -> scope remains open.
+// Case 2 — no original sprints remain -> await_scope_completion -> explicit decision.
 {
   const root = sandbox();
   try {
     const res = run(root);
     const out = res.stdout + res.stderr;
     assert(res.status === 0, `happy close should succeed: ${out}`);
-    assert(out.includes('Next action: plan_sprint'), `expected plan_sprint next action: ${out}`);
-    assert(out.includes('Scope remains open for planning'), `expected open-scope message: ${out}`);
-    assert(out.includes('FRESH session'), `expected fresh-session nudge after final roadmap sprint: ${out}`);
-    assert(out.includes('task-context'), `expected task-context pointer after final roadmap sprint: ${out}`);
+    assert(out.includes('Next action: await_scope_completion'), `expected await_scope_completion next action: ${out}`);
+    assert(out.includes('Roadmap exhausted'), `expected explicit-decision message: ${out}`);
+    assert(out.includes('scope complete'), `expected completion command: ${out}`);
+    assert(out.includes('Expand'), `expected expansion option: ${out}`);
     const sprint = JSON.parse(readFileSync(sprintPath(root), 'utf-8'));
-    assert(sprint.handoff.nextAction === 'plan_sprint', `sprint.json nextAction must be plan_sprint, got ${sprint.handoff.nextAction}`);
+    assert(sprint.handoff.nextAction === 'await_scope_completion', `sprint.json must await completion, got ${sprint.handoff.nextAction}`);
     assert(sprint.status === 'planning', `sprint.json status must remain planning, got ${sprint.status}`);
+    assert(sprint.activeSprint === null && sprint.roadmap.sprints.every((entry) => entry.state === 'closed'), 'close must produce an exhausted idle roadmap');
+    const checkpointPath = join(root, '.agents/kyro/scopes/demo/archive/sprint-001-demo-sprint.checkpoint.json');
+    const checkpointBytes = readFileSync(checkpointPath, 'utf8');
+    const checkpoint = JSON.parse(checkpointBytes);
+    assert(JSON.stringify(checkpoint.intendedAfterClose) === JSON.stringify(sprint), 'ledger/checkpoint must bind the actual close after-image');
+    const doctor = command(root, ['doctor', '--artifacts', '--kyro-scope', 'demo']);
+    assert(doctor.status === 0 && doctor.stdout.includes('APPLIED:'), `real close must verify: ${doctor.stdout}${doctor.stderr}`);
+    const packed = command(root, ['context-pack', '--kyro-scope', 'demo', '--json']);
+    assert(packed.status === 0, `decision pack failed: ${packed.stdout}${packed.stderr}`);
+    const pack = JSON.parse(packed.stdout).data;
+    assert(pack.nextAction === 'await_scope_completion' && pack.status === 'planning' && pack.routing.modes.length === 0, 'real decision route must not auto-load planning');
+    const completion = pack.cliRecipes.find((recipe) => recipe.id === 'scope-complete');
+    assert(completion && !completion.command.includes('--yes') && completion.purpose.includes('human confirmation'), 'completion recipe must preview before confirmation');
+    assert(pack.cliRecipes.some((recipe) => recipe.id === 'plan-from' && recipe.purpose.includes('explicitly requested')), 'pack must offer explicit expansion');
+    const beforePreview = readFileSync(sprintPath(root), 'utf8');
+    const preview = command(root, ['scope', 'complete', '--kyro-scope', 'demo']);
+    assert(preview.status !== 0 && (preview.stdout + preview.stderr).includes('CONFIRMATION_REQUIRED'), 'unconfirmed completion must not apply');
+    assert(readFileSync(sprintPath(root), 'utf8') === beforePreview, 'preview wrote live state');
+    const complete = command(root, ['scope', 'complete', '--kyro-scope', 'demo', '--yes']);
+    assert(complete.status === 0, `confirmed completion failed: ${complete.stdout}${complete.stderr}`);
+    const completed = JSON.parse(readFileSync(sprintPath(root), 'utf8'));
+    assert(completed.completion && !completed.retirement && completed.handoff.nextAction === 'done', 'delivered work must complete, not retire');
+    assert(readFileSync(checkpointPath, 'utf8') === checkpointBytes, 'completion must preserve checkpoint bytes');
+
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -101,12 +128,12 @@ function run(root, extra = []) {
     const out = res.stdout + res.stderr;
     assert(res.status === 0, `partial close should succeed: ${out}`);
     assert(out.includes('partial'), `partial close should report a partial outcome: ${out}`);
-    assert(out.includes('Next action: plan_sprint'), `final-roadmap partial close must route to plan_sprint, got: ${out}`);
-    assert(out.includes('Scope remains open for planning'), `expected open-scope message on partial close: ${out}`);
+    assert(out.includes('Next action: await_scope_completion'), `final-roadmap partial close must await decision, got: ${out}`);
+    assert(out.includes('Roadmap exhausted'), `expected explicit-decision message on partial close: ${out}`);
     assert(!out.includes('Scope objective met'), `done message must never appear for an open post-close scope: ${out}`);
 
     const closed = JSON.parse(readFileSync(sprintPath(root), 'utf-8'));
-    assert(closed.handoff.nextAction === 'plan_sprint', `sprint.json nextAction must be plan_sprint, got ${closed.handoff.nextAction}`);
+    assert(closed.handoff.nextAction === 'await_scope_completion', `sprint.json must await completion, got ${closed.handoff.nextAction}`);
     assert(closed.status === 'planning', `scope must remain planning after partial final close, got ${closed.status}`);
     assert(closed.activeSprint === null, 'activeSprint must be cleared by close');
     assert(closed.ledger.length === 1 && closed.ledger[0].outcome === 'partial', 'ledger must record the partial outcome');

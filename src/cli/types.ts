@@ -200,6 +200,7 @@ export type NextAction =
   | 'init'
   | 'clarify'
   | 'plan_sprint'
+  | 'await_scope_completion'
   | 'execute_task'
   | 'review_task'
   | 'close_sprint'

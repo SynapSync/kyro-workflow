@@ -1,0 +1,32 @@
+{
+  "version": "4.47.2",
+  "commit": "24a2f45e7a61d31a357d27befb09e19d98ba58bf",
+  "writerSha256": "03f5471a8a8e179b99955a481b038e5768fc07da33e631097d0b3dee166f67a9",
+  "compiledWriterSha256": "1767865efb63d8da1ff441f80d84e65bc7224ca8dfb6b224c8380dcb1354305d",
+  "cases": [
+    {
+      "id": "final-shipped-default",
+      "roadmap": "final",
+      "outcome": "shipped",
+      "note": null,
+      "args": [
+        "close-sprint",
+        "--kyro-scope",
+        "demo",
+        "--outcome",
+        "shipped",
+        "--yes"
+      ],
+      "boundaries": [],
+      "historicalDoctor": "exit 0; APPLIED",
+      "expectedAction": "done"
+    }
+  ],
+  "files": {
+    "final-shipped-default/applied/.agents/kyro/kyro.json": "9ec0b6788a07e93e8dd76c032d3b7aa5928e9df8d1c72b3056ad1729c241600d",
+    "final-shipped-default/applied/.agents/kyro/scopes/demo/archive/sprint-001-demo-sprint.checkpoint.json": "1f12bb164576ae2696b8713bc27cf0106946cd4f63fd17e2ed224c1d429ddb3c",
+    "final-shipped-default/applied/.agents/kyro/scopes/demo/archive/sprint-001-demo-sprint.json": "78e42caf2b19a712b981cdf4732297eaf6d50fd8d1b247bb2e96e6b13556b326",
+    "final-shipped-default/applied/.agents/kyro/scopes/demo/archive/sprint-001-demo-sprint.md": "b99192b5cee861c0adaa3ffd9218df741565a457ec5d1c2c9cae74d47308b17c",
+    "final-shipped-default/applied/.agents/kyro/scopes/demo/sprint.json": "eee6361c4f7838700106c42f273c8a75836dcbeb5e2c5cf0fb6d807ed24e4192"
+  }
+}

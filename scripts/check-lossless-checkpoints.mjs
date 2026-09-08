@@ -316,7 +316,7 @@ function closeSuccessfully(root) {
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
 
-// Empty roadmap at close follows deriveScopeStatus → planning (pathological / hand-edited).
+// Empty roadmap at close remains planning but awaits the explicit completion-or-expansion decision.
 {
   const root = makeSandbox();
   try {
@@ -325,7 +325,7 @@ function closeSuccessfully(root) {
     writeJson(paths(root).sprint, sprint);
     const checkpoint = closeSuccessfully(root);
     assert(checkpoint.projectScopeAfter.status === 'planning', 'empty roadmap must yield projectScopeAfter=planning under SSOT');
-    assert(readJson(paths(root).sprint).handoff.nextAction === 'plan_sprint', 'empty roadmap remaining=0 must still route handoff to plan_sprint');
+    assert(readJson(paths(root).sprint).handoff.nextAction === 'await_scope_completion', 'empty roadmap must await an explicit completion-or-expansion decision');
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
 

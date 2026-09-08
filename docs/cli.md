@@ -478,7 +478,7 @@ Kyro evaluates dangerous operations through a shared policy core. `scope set-act
 
 `kyro close-sprint` is the only verb that confirms interactively. Outside a TTY (agent harness, CI, piped shell) it fails immediately with `CONFIRMATION_REQUIRED` instead of prompting for input that can never arrive — pass `--yes` to complete the gate non-interactively, or `--dry-run` to preview it.
 
-Close requires every unfinished task to have a typed `task.disposition`. The persisted outcome is `shipped`/`completed` only when every task is `done` with a passing verdict; otherwise it is derived `partial` (or explicit `abandoned`). Dry-run, the narrative, the checkpoint `beforeClose` image, and the ledger entry all expose those dispositions. Closing a sprint never completes the scope: `handoff.nextAction` returns to `plan_sprint` so a later sprint can be materialized with `kyro plan --from`. Explicit completion (`kyro scope complete`, routed by Forge when the user asks to close a finished scope) is the delivery terminal; retirement is a separate obsolete-scope path.
+Close requires every unfinished task to have a typed `task.disposition`. The persisted outcome is `shipped`/`completed` only when every task is `done` with a passing verdict; otherwise it is derived `partial` (or explicit `abandoned`). Dry-run, the narrative, the checkpoint `beforeClose` image, and the ledger entry all expose those dispositions. Closing a sprint never completes the scope. If roadmap work remains, `handoff.nextAction` is `plan_sprint`; after its final entry it is `await_scope_completion`, which requires an explicit choice to complete (`kyro scope complete`) or expand with `kyro plan --from`. Completion is the delivery terminal; retirement is a separate obsolete-scope path.
 
 ## Runtime capability handshake (`kyro capabilities`)
 
@@ -743,7 +743,7 @@ that leaves an immutable record of itself.
 | Runtime | Operations | Repairs |
 | --- | --- | --- |
 | **4.43.5 and earlier** | `debt.origin.set` (protocol v1/v2) | A wrong or non-numeric `origin`, and nothing else. |
-| **4.44.0 and later** (current: **4.48.1**) | adds `debt.canonicalize` (protocol v3) | A whole legacy debt record: broken or absent canonical fields *and* legacy-only keys such as `detail`, `resolution`, `addedSprint`. |
+| **4.44.0 and later** (current: **4.48.2**) | adds `debt.canonicalize` (protocol v3) | A whole legacy debt record: broken or absent canonical fields *and* legacy-only keys such as `detail`, `resolution`, `addedSprint`. |
 
 **Kyro 4.43.5 is origin-only and cannot repair a record-level legacy shape.** If a debt carries a
 string `origin` *and* legacy-only keys *and* missing canonical fields — the shape real pre-contract

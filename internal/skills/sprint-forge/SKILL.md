@@ -52,17 +52,20 @@ its own (`kyro-ai:sprint-forge`), and on that path the orchestrator is never loa
 2. Read `.agents/kyro/project.json` + `.agents/kyro/local.json`. Unreadable/corrupt → stop here.
 3. Resolve the scope from user input, `local.json.activeScope`, or the only directory under
    `.agents/kyro/scopes/`. Ambiguous or none → ask the user before continuing.
-4. Silently run `{{KYRO_CLI}} repair integrity prepare --kyro-scope <scope> --json` before
-   `context-pack`, using the scope resolved above. Never omit `--kyro-scope` here — it isolates this
+4. A scope that does not exist yet — neither in `project.json` nor on disk — is creation,
+   not corruption: skip `repair` and `context-pack`, load `modes/INIT.md`, and never route it
+   to recovery.
+5. Only for an existing scope, silently run `{{KYRO_CLI}} repair integrity prepare --kyro-scope
+   <scope> --json` before `context-pack`. Never omit `--kyro-scope` here — it isolates this
    scope from unrelated drift. Findings/blockers → load `modes/recover.md` and stop. None → continue.
-5. **Capability handshake:** run `{{KYRO_CLI}} capabilities --json`. Unknown command, handshake
+6. **Capability handshake:** run `{{KYRO_CLI}} capabilities --json`. Unknown command, handshake
    failure, or a missing tool-owned verb (`record-evidence` included) means the runtime is unusable: ABORT without mutating Kyro
    state. Report the observed output of `{{KYRO_CLI}} --version` (or `not installed`) and the exact
    remedy `npx kyro-ai@latest sync --scope workspace --yes`. Never work around it by hand.
-6. Resolve routing with `{{KYRO_CLI}} context-pack --kyro-scope <scope> --json` (lean pack:
+7. Resolve routing with `{{KYRO_CLI}} context-pack --kyro-scope <scope> --json` (lean pack:
    `nextAction`, `nextTaskId`, `reviewPending`, `conventions`, budget). Do not open the full
    `sprint.json` to route. No `sprint.json` → INIT.
-7. Load the single mode named by the pack's `nextAction` (see Routing below).
+8. Load the single mode named by the pack's `nextAction` (see Routing below).
 
 **If Step 0 did not complete, no Kyro artifact gets written.** A CLI you could not resolve, a failed
 handshake, or a missing runtime are all STOP conditions — never a reason to hand-author `sprint.json`,
@@ -118,6 +121,7 @@ User intent to complete/close a finished scope is `{{KYRO_CLI}} scope complete` 
 | `init` (no sprint.json) | `modes/INIT.md` + one `helpers/analysis/{workType}.md` |
 | `clarify` | `modes/clarify.md` |
 | `plan_sprint` | `modes/SPRINT.md`, `modes/plan-sprint.md`, then `helpers/sprint-generator.md` |
+| `await_scope_completion` | Ask: complete the finished scope, or explicitly expand it. Complete → `scope complete`; expand → then route as `plan_sprint`. |
 | `execute_task` | `modes/SPRINT.md`, `modes/execute-task.md` |
 | `review_task` | `modes/SPRINT.md`, `modes/review-task.md`, `helpers/reviewer.md` |
 | `close_sprint` | `modes/SPRINT.md`, `modes/close-sprint.md`, `helpers/debt-tracker.md` + `helpers/learner.md` as needed |

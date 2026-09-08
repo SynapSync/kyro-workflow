@@ -8,6 +8,7 @@ Lightweight index for sprint work. Do not load the full sprint protocol upfront.
 |------------|------|
 | `clarify` | `clarify.md` |
 | `plan_sprint` | `plan-sprint.md` |
+| `await_scope_completion` | Ask: complete the scope, or explicitly expand it and load `plan-sprint.md`. |
 | `execute_task` | `execute-task.md` |
 | `review_task` | `review-task.md` |
 | `close_sprint` | `close-sprint.md` |

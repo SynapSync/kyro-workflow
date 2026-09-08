@@ -42,10 +42,10 @@
   "activeSprint": null,
   "debt": [],
   "handoff": {
-    "nextAction": "plan_sprint",
+    "nextAction": "await_scope_completion",
     "nextTaskId": null,
     "blockers": [],
-    "note": "Sprint 1 (demo-sprint) closed as shipped. Scope remains open for planning.",
+    "note": "Sprint 1 (demo-sprint) closed as shipped. Roadmap exhausted; await explicit scope completion or an expansion decision.",
     "lastUpdated": "<NORMALIZED>"
   }
 }

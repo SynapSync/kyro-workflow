@@ -17,18 +17,22 @@ const TOKEN_BUDGET = {
   startupTokens: 1500,
   statusBriefTokens: 2000,
   initHappyPathTokens: 2000,
-  orchestratorWords: 800,
+  // The creation-flow existence gate (absent scope -> INIT, repair existing-only) is startup-critical
+  // routing: without it every create-from-plan flow stops on a false irreconcilable blocker.
+  // 875 leaves six words above the measured 869-word asset.
+  orchestratorWords: 875,
   // 4.42.0 raised this from 800: SKILL.md now carries the full Step 0 startup handshake, because
   // the skill is invocable on its own and the orchestrator — which held the only copy — never
   // loads on that path. Buying it back by trimming the contract was the wrong trade; a scope
   // hand-authored without the handshake costs far more than the tokens it saves.
-  // Forge now carries the completion-vs-retirement routing contract for standalone invocation.
-  // 1330 leaves 11 words above the measured 1319-word asset.
-  sprintForgeSkillWords: 1330,
+  // Forge carries completion-vs-retirement plus the post-roadmap decision contract.
+  // The creation-flow existence gate adds 43 words; 1392 leaves seven above the measured 1385-word asset.
+  sprintForgeSkillWords: 1392,
   seedbedSkillWords: 700,
   seedbedModeWords: 900,
   seedbedHelperWords: 450,
-  runtimeStatusBriefTokens: 1630,
+  // +7 tokens from the shared existence-gate wording (orchestrator loads on this path).
+  runtimeStatusBriefTokens: 1670,
   // Path budgets preserve the production agent contracts (orchestrator + SKILL + routed
   // mode/helpers) with roughly 10% headroom. They remain explicit ceilings so future growth is
   // reviewed instead of silently accumulating.
@@ -39,17 +43,17 @@ const TOKEN_BUDGET = {
   // 4.47.0 raised this from 4180: Forge/orchestrator/SKILL now diagnose integrity *before*
   // scope resolution. That step is load-bearing for an empty activeScope; trimming it to
   // keep the old ceiling would leave recovery unreachable on the execute route.
-  // Completion intent routing is loaded with every Forge path. CI measures the projected Forge
-  // skill (not the shorter local stub): plan=5076, execute=4544, review=4701, close=5730.
-  // Keep only 6–10 tokens of headroom above those installed-runtime paths.
-  runtimeForgeExecuteTokens: 4550,
-  runtimeForgeReviewTokens: 4710,
-  runtimeForgePlanTokens: 5085,
-  runtimeForgeCloseTokens: 5740,
-  runtimeForgeInitTokens: 5010,
+  // CI measures projected runtime paths. The creation-flow existence gate (present in forge.md,
+  // orchestrator.md and SKILL.md on every path) measures init=5283, init-seedbed=5613, plan=5373,
+  // execute=4841, review=4998, close=5906; retain 7–9 tokens of headroom.
+  runtimeForgeExecuteTokens: 4850,
+  runtimeForgeReviewTokens: 5005,
+  runtimeForgePlanTokens: 5380,
+  runtimeForgeCloseTokens: 5915,
+  runtimeForgeInitTokens: 5290,
   // Seedbed-backed INIT adds one lazy mapping helper to the normal INIT route. The ceiling keeps
   // roughly 10% headroom over the measured router + orchestrator + skill + mode + analysis + mapping path.
-  runtimeForgeInitSeedbedTokens: 5370,
+  runtimeForgeInitSeedbedTokens: 5620,
   runtimeTaskContextTokens: 2200,
   runtimeIdeaTokens: 5200,
 } as const;

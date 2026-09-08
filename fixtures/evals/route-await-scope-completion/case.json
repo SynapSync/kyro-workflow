@@ -1,0 +1,22 @@
+{
+  "evalCaseSchemaVersion": 1,
+  "id": "route-await-scope-completion",
+  "title": "Synthetic literal routing for scope decision (not close-history proof)",
+  "kind": "replay",
+  "tags": ["routing", "scope-completion"],
+  "agents": ["any"],
+  "scope": "demo",
+  "steps": [
+    {
+      "run": ["doctor", "--artifacts", "--kyro-scope", "demo"],
+      "expect": { "exitCode": 0, "stdoutIncludes": ["[PASS]"] }
+    }
+  ],
+  "expectFinalState": false,
+  "route": {
+    "nextAction": "await_scope_completion",
+    "expectedModes": [],
+    "expectedBudgetClass": "brief",
+    "expectedReasoningTier": "light"
+  }
+}

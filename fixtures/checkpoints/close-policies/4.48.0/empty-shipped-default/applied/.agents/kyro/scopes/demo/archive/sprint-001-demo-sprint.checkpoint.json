@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "kind": "kyro.sprint-close-checkpoint",
+  "checkpointId": "2bdbfa9b3a3a4c3b9e7dfa1f63236beaa13cffb8610a0e41c1dd975ab5fd1035",
+  "createdAt": "2026-09-08T11:35:47.509Z",
+  "identity": {
+    "scope": "demo",
+    "sprintN": 1,
+    "sprintSlug": "demo-sprint"
+  },
+  "close": {
+    "outcome": "shipped",
+    "note": null,
+    "summary": null,
+    "recommendations": [],
+    "learnings": []
+  },
+  "paths": {
+    "legacySnapshot": ".agents/kyro/scopes/demo/archive/sprint-001-demo-sprint.json",
+    "narrative": ".agents/kyro/scopes/demo/archive/sprint-001-demo-sprint.md"
+  },
+  "beforeClose": {
+    "schemaVersion": 4,
+    "scope": "demo",
+    "title": "Demo",
+    "status": "active",
+    "objective": "Demo objective",
+    "successCriteria": [
+      "Demo works."
+    ],
+    "clarifications": [],
+    "conventions": [],
+    "roadmap": {
+      "plannedSprintCount": 0,
+      "sprints": []
+    },
+    "ledger": [],
+    "previousSprint": null,
+    "activeSprint": {
+      "n": 1,
+      "slug": "demo-sprint",
+      "title": "Demo Sprint",
+      "objective": "Ship demo sprint.",
+      "status": "complete",
+      "phases": [
+        {
+          "id": "P1",
+          "title": "Demo Phase",
+          "objective": "Complete demo work.",
+          "status": "done",
+          "tasks": [
+            {
+              "id": "T1.1",
+              "title": "Implement demo",
+              "description": "Implement the demo task.",
+              "files_to_touch": [
+                "src/demo.ts"
+              ],
+              "context": "Use the existing demo pattern.",
+              "acceptance_criteria": [
+                "Validation passes."
+              ],
+              "depends_on": [],
+              "status": "done",
+              "evidence": {
+                "summary": "done",
+                "validation": "ok",
+                "files_changed": [
+                  "src/demo.ts"
+                ],
+                "notes": "",
+                "by": "maker",
+                "recordedAt": "2026-07-02T00:00:00.000Z"
+              },
+              "verdict": {
+                "result": "pass",
+                "checked_criteria": [
+                  "Validation passes."
+                ],
+                "findings": [],
+                "by": "checker",
+                "reviewedAt": "2026-07-02T00:01:00.000Z"
+              }
+            }
+          ]
+        }
+      ],
+      "emergentTasks": [],
+      "definitionOfDone": [
+        "All tasks done."
+      ]
+    },
+    "debt": [],
+    "handoff": {
+      "nextAction": "close_sprint",
+      "nextTaskId": "T1.1",
+      "blockers": [],
+      "note": "Resume demo.",
+      "lastUpdated": "2026-07-02"
+    }
+  },
+  "intendedAfterClose": {
+    "schemaVersion": 4,
+    "scope": "demo",
+    "title": "Demo",
+    "status": "planning",
+    "objective": "Demo objective",
+    "successCriteria": [
+      "Demo works."
+    ],
+    "clarifications": [],
+    "conventions": [],
+    "roadmap": {
+      "plannedSprintCount": 0,
+      "sprints": []
+    },
+    "ledger": [
+      {
+        "n": 1,
+        "slug": "demo-sprint",
+        "outcome": "shipped",
+        "closedAt": "2026-09-08",
+        "archive": "archive/sprint-001-demo-sprint.md",
+        "snapshot": "archive/sprint-001-demo-sprint.json",
+        "checkpoint": "archive/sprint-001-demo-sprint.checkpoint.json",
+        "checkpointSha256": "3cf7b38072594a5e050c92cee8c0b15125c37d0e68fce5b7a700f992e63c7295"
+      }
+    ],
+    "previousSprint": {
+      "n": 1,
+      "slug": "demo-sprint",
+      "outcome": "shipped",
+      "summary": "Ship demo sprint."
+    },
+    "activeSprint": null,
+    "debt": [],
+    "handoff": {
+      "nextAction": "plan_sprint",
+      "nextTaskId": null,
+      "blockers": [],
+      "note": "Sprint 1 (demo-sprint) closed as shipped. Scope remains open for planning.",
+      "lastUpdated": "2026-09-08"
+    }
+  },
+  "projectScopeBefore": {
+    "id": "demo",
+    "title": "Demo",
+    "status": "active"
+  },
+  "projectScopeAfter": {
+    "id": "demo",
+    "title": "Demo",
+    "status": "planning"
+  },
+  "digests": {
+    "beforeClose": "ecacaeb5852409cf7338bcf82f5470b44d0213f966ea1dc438b9ee57c67adc5f",
+    "intendedAfterClose": "9f08693a894d3a9452e427a752c9d25ba5968baec17edf35c17d36b99d229d1f",
+    "projectScopeBefore": "cc0918da4195abe8473183ea749a6b5c194323480bf80521fd77fe54a0fe04d5",
+    "projectScopeAfter": "d495c8423eba5319bdfccd28486b4b4f5a145640c18ab23ca870a7e2ad4b582c",
+    "legacySnapshot": "78e42caf2b19a712b981cdf4732297eaf6d50fd8d1b247bb2e96e6b13556b326",
+    "narrative": "f897b5f4c71c06c762e84d2b3c166b25386d2ad08c4b0747cbe270685bf601db"
+  }
+}
