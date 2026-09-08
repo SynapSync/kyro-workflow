@@ -34,6 +34,7 @@ Continue Kyro work without loading the whole workflow upfront.
 | No `sprint.json` for the scope | `skills/sprint-forge/assets/modes/INIT.md` |
 | `nextAction: "clarify"` | `skills/sprint-forge/assets/modes/clarify.md` |
 | `nextAction: "plan_sprint"` | `skills/sprint-forge/assets/modes/plan-sprint.md` |
+| `nextAction: "await_scope_completion"` | Ask: complete the finished scope, or explicitly expand it. Complete → `scope complete`; expand → then route as `plan_sprint`. |
 | `nextAction: "execute_task"` | `skills/sprint-forge/assets/modes/execute-task.md` |
 | `nextAction: "review_task"` | `skills/sprint-forge/assets/modes/review-task.md` |
 | `nextAction: "close_sprint"` | `skills/sprint-forge/assets/modes/close-sprint.md` |

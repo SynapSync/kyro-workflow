@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 4,
+  "scope": "demo",
+  "title": "Demo",
+  "status": "planning",
+  "objective": "Demo objective",
+  "successCriteria": [
+    "Demo works."
+  ],
+  "clarifications": [],
+  "conventions": [],
+  "roadmap": {
+    "plannedSprintCount": 0,
+    "sprints": []
+  },
+  "ledger": [
+    {
+      "n": 1,
+      "slug": "demo-sprint",
+      "outcome": "partial",
+      "closedAt": "2026-09-08",
+      "archive": "archive/sprint-001-demo-sprint.md",
+      "snapshot": "archive/sprint-001-demo-sprint.json",
+      "checkpoint": "archive/sprint-001-demo-sprint.checkpoint.json",
+      "checkpointSha256": "63a0dbfbaf355cda867ee72de98d453c2702764b5074d25ec7b5c9a5c06641aa"
+    }
+  ],
+  "previousSprint": {
+    "n": 1,
+    "slug": "demo-sprint",
+    "outcome": "partial",
+    "summary": "Ship demo sprint."
+  },
+  "activeSprint": null,
+  "debt": [],
+  "handoff": {
+    "nextAction": "plan_sprint",
+    "nextTaskId": null,
+    "blockers": [],
+    "note": "Human-provided close note; preserve exactly.",
+    "lastUpdated": "2026-09-08"
+  }
+}

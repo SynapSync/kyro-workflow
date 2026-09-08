@@ -5,7 +5,7 @@
 //     activeSprint: null). Covers the happy path, [NEEDS CLARIFICATION] routing (allowed here,
 //     unlike execute-phase commands), SCOPE_ALREADY_INITIALIZED-shaped refusal on replay (no
 //     overwrite — see case 3), input validation, scope-mismatch rejection, and --dry-run.
-//   - sprint mode (sprint.json ready to plan: activeSprint null, handoff.nextAction plan_sprint):
+//   - sprint mode (sprint.json ready to plan: activeSprint null, handoff.nextAction plan_sprint or await_scope_completion):
 //     materializes the next activeSprint from a lean sprint-plan file. Covers the happy path,
 //     marker routing to clarify, SPRINT_ALREADY_ACTIVE refusal, wrong sprint.n, bad depends_on /
 //     scenario_refs references, and --dry-run.
@@ -721,14 +721,15 @@ function initScope(root, scope = 'demo-scope') {
   }
 }
 
-// 14) S3 — a scope whose original roadmap is fully closed and which has NO active sprint can plan a
-//     later sprint through the normal tool-owned route (plan sprint mode), without any recovery.
-//     This falsifies the prior "roadmap exhausted => done" behavior end-to-end: the post-close
-//     handoff stays plan_sprint and plan materializes the next sprint directly.
+// 14) S3 — a scope whose original roadmap is fully closed awaits an explicit completion-or-
+//     expansion decision. Invoking the plan writer expresses the latter and materializes a later
+//     sprint without recovery; roadmap exhaustion must never mint done.
 {
   const root = sandbox();
   try {
-    const leanPath = writeLeanPlan(root, validLeanPlan());
+    const leanPath = writeLeanPlan(root, validLeanPlan({
+      roadmap: { plannedSprintCount: 1, sizingRationale: 'One sprint proves the post-roadmap decision state.', sprints: [{ n: 1, slug: 'first', title: 'First', state: 'planned' }] },
+    }));
     const initResult = run(['plan', '--from', leanPath], root);
     assert(initResult.status === 0, `init should succeed: ${initResult.stdout}${initResult.stderr}`);
 
@@ -749,23 +750,25 @@ function initScope(root, scope = 'demo-scope') {
     const closeResult = run(['close-sprint', '--kyro-scope', 'demo-scope', '--outcome', 'partial', '--yes'], root);
     assert(closeResult.status === 0, `partial close should succeed: ${closeResult.stdout}${closeResult.stderr}`);
     const closed = readSprint(root, 'demo-scope');
-    assert(closed.handoff.nextAction === 'plan_sprint', `post-close handoff must be plan_sprint, got ${closed.handoff.nextAction}`);
+    assert(closed.handoff.nextAction === 'await_scope_completion', `post-close handoff must await completion, got ${closed.handoff.nextAction}`);
     assert(closed.status === 'planning', `post-close scope must remain planning, got ${closed.status}`);
     assert(closed.activeSprint === null, 'activeSprint must be null after close');
 
-    // Simulate an old/stale stored scope status. Context-pack must expose the canonical derived
-    // lifecycle state instead of blindly rendering this field: the scope is still open to plan.
-    closed.status = 'completed';
-    writeFileSync(sprintPath(root, 'demo-scope'), `${JSON.stringify(closed, null, 2)}\n`);
+    // Keep the writer-generated state intact: this is a real close-to-expansion path.
+    const doctor = run(['doctor', '--artifacts', '--kyro-scope', 'demo-scope'], root);
+    assert(doctor.status === 0 && doctor.stdout.includes('APPLIED:'), `closed history must verify: ${doctor.stdout}${doctor.stderr}`);
     const packResult = run(['context-pack', '--kyro-scope', 'demo-scope', '--json'], root);
     assert(packResult.status === 0, `post-close context-pack should succeed: ${packResult.stdout}${packResult.stderr}`);
     const envelope = JSON.parse(packResult.stdout);
     assert(envelope.schemaVersion === 1 && envelope.ok === true, 'context-pack must return a successful CLI envelope');
     const pack = envelope.data;
-    assert(pack.status === 'planning', `context-pack must derive planning instead of stale completed, got ${pack.status}`);
-    assert(pack.nextAction === 'plan_sprint', `context-pack must preserve plan_sprint routing, got ${pack.nextAction}`);
+    assert(pack.status === 'planning', `context-pack must report planning, got ${pack.status}`);
+    assert(pack.nextAction === 'await_scope_completion', `context-pack must expose the decision state, got ${pack.nextAction}`);
 
-    // Now plan Sprint 2 (outside the original roadmap) through the normal route.
+    assert(pack.routing.modes.length === 0, 'decision state must not load planning automatically');
+    assert(closed.roadmap.sprints.every((entry) => entry.state === 'closed'), 'real close must exhaust roadmap');
+
+    // Now explicitly expand with Sprint 2 (outside the original roadmap) through the normal writer.
     const second = writeLeanSprintPlan(root, validLeanSprintPlan({
       sprint: { n: 2, slug: 'hardening', title: 'Hardening', objective: 'Harden it.' },
       phases: [
@@ -839,6 +842,17 @@ function initScope(root, scope = 'demo-scope') {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+}
+
+
+// Help must advertise exactly the two idle handoffs accepted by the writer.
+{
+  const root = sandbox();
+  try {
+    const help = run(['plan', '--help'], root);
+    assert(help.status === 0 && help.stdout.includes('"plan_sprint"') && help.stdout.includes('"await_scope_completion"'), 'plan help must list both supported handoffs');
+    assert(help.stdout.includes('explicitly chooses scope expansion'), 'plan help must explain expansion intent');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 }
 
 console.log('check:plan — tool-owned scope bootstrap (init) and sprint materialization (sprint) verified end-to-end');

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 4,
+  "scope": "demo",
+  "title": "Demo",
+  "status": "planning",
+  "objective": "Demo objective",
+  "successCriteria": [
+    "Demo works."
+  ],
+  "clarifications": [],
+  "conventions": [],
+  "roadmap": {
+    "plannedSprintCount": 2,
+    "sizingRationale": "One sprint is enough.",
+    "sprints": [
+      {
+        "n": 1,
+        "slug": "demo-sprint",
+        "title": "Demo Sprint",
+        "state": "closed"
+      },
+      {
+        "n": 2,
+        "slug": "next",
+        "title": "Next",
+        "state": "planned"
+      }
+    ]
+  },
+  "ledger": [
+    {
+      "n": 1,
+      "slug": "demo-sprint",
+      "outcome": "shipped",
+      "closedAt": "2026-09-08",
+      "archive": "archive/sprint-001-demo-sprint.md",
+      "snapshot": "archive/sprint-001-demo-sprint.json",
+      "checkpoint": "archive/sprint-001-demo-sprint.checkpoint.json",
+      "checkpointSha256": "6d03cad91152c4ac85a5474cc23594ef6b495624e82f010c0fddcece1becfc4b"
+    }
+  ],
+  "previousSprint": {
+    "n": 1,
+    "slug": "demo-sprint",
+    "outcome": "shipped",
+    "summary": "Ship demo sprint."
+  },
+  "activeSprint": null,
+  "debt": [],
+  "handoff": {
+    "nextAction": "plan_sprint",
+    "nextTaskId": null,
+    "blockers": [],
+    "note": "Sprint 1 (demo-sprint) closed as shipped. Scope remains open for planning.",
+    "lastUpdated": "2026-09-08"
+  }
+}
