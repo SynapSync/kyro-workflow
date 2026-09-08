@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+## [4.48.2] - 2026-09-08
+
 ### Fixed
 
 - **Forge no longer sends scope creation through repair/recovery.** The router startup used to
