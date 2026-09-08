@@ -886,7 +886,10 @@ for (const mode of ['corrupt', 'unsupported']) {
     writeJson(join(lock, 'owner.json'), { pid: process.pid, token, createdAt: old });
     writeJson(join(lock, 'heartbeat.json'), { token, renewedAt: old, leaseUntil: old + 100 });
     const crashed = run(root, ['repair', '--kyro-scope', 'demo', '--confirm'], {
-      KYRO_TEST_LOCK_LEASE_MS: '500',
+      // Same CI-safe lease as below: the crash hook fires after claim publication, so the
+      // lease length cannot mask it — but a 500ms lease can lapse during Worker startup
+      // under Windows runner load before the claim is even published.
+      KYRO_TEST_LOCK_LEASE_MS: CI_SAFE_TEST_LEASE_MS,
       KYRO_TEST_LOCK_CRASH_AFTER_RECLAIM_CLAIM: '1',
     });
     assert(crashed.status === 86, `reclaim crash hook did not terminate after durable claim publication: ${output(crashed)}`);
@@ -1124,7 +1127,10 @@ for (const mode of ['corrupt', 'unsupported']) {
     utimesSync(ownerSymlinkClaim, stale, stale);
     symlinkSync(victimFile, join(lock, 'heartbeat.json.tmp-33333333-3333-4333-8333-333333333333'));
 
-    const recovered = run(root, ['repair', '--kyro-scope', 'demo', '--confirm'], { KYRO_TEST_LOCK_LEASE_MS: '500' });
+    // The fixture lease is already expired; KYRO_TEST_LOCK_LEASE_MS only bounds the new
+    // writer's own heartbeat. 500ms lapsed on Windows/Node 18 CI during reclaim+repair
+    // (main run 34265409225: lease fail-stop), which is not what this symlink-safety case tests.
+    const recovered = run(root, ['repair', '--kyro-scope', 'demo', '--confirm'], { KYRO_TEST_LOCK_LEASE_MS: CI_SAFE_TEST_LEASE_MS });
     assert(recovered.status === 0, `safe reclaim was blocked by malicious prefix symlinks: ${output(recovered)}`);
     assert(readFileSync(victimFile, 'utf8') === 'untouched\n' && existsSync(victim), 'reclaim cleanup followed a symlink and modified the victim');
   } finally { rmSync(root, { recursive: true, force: true }); rmSync(victim, { recursive: true, force: true }); }
